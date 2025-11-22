@@ -9,10 +9,7 @@ const nextConfig = {
   images: {
     domains: [],
   },
-  // Sentry configuration
-  sentry: {
-    hideSourceMaps: true,
-  },
+  // Sentry configuration is handled by withSentryConfig wrapper
 };
 
 const config = withSentryConfig(nextConfig, {

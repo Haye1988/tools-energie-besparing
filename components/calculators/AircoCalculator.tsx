@@ -92,7 +92,7 @@ export default function AircoCalculator() {
                 label="Koeluren per jaar"
                 name="koelurenPerJaar"
                 type="number"
-                value={input.koelurenPerJaar}
+                value={input.koelurenPerJaar ?? 720}
                 onChange={(val) => setInput({ ...input, koelurenPerJaar: Number(val) })}
                 min={0}
                 step={100}
@@ -103,7 +103,7 @@ export default function AircoCalculator() {
                 label="Stroomprijs"
                 name="stroomPrijs"
                 type="number"
-                value={input.stroomPrijs}
+                value={input.stroomPrijs ?? 0.27}
                 onChange={(val) => setInput({ ...input, stroomPrijs: Number(val) })}
                 min={0}
                 step={0.01}

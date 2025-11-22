@@ -81,7 +81,7 @@ export default function ThuisbatterijCalculator() {
                   label="Gewenste autonomie"
                   name="gewensteAutonomie"
                   type="number"
-                  value={input.gewensteAutonomie || 4}
+                  value={input.gewensteAutonomie ?? 4}
                   onChange={(val) => setInput({ ...input, gewensteAutonomie: Number(val) })}
                   min={1}
                   max={24}
