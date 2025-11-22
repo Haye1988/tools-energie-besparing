@@ -19,4 +19,3 @@ const config = withSentryConfig(nextConfig, {
 });
 
 module.exports = withBundleAnalyzer(config);
-

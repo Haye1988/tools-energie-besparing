@@ -34,4 +34,3 @@ test.describe("Homepage", () => {
     await expect(page.getByRole("heading", { name: /Zonnepanelen Calculator/i })).toBeVisible();
   });
 });
-

@@ -37,30 +37,31 @@ export function berekenBoilers(input: BoilersInput): BoilersResult {
     warmwaterBehoefte = "gemiddeld",
     huidigSysteem,
     stroomPrijs = 0.27,
-    gasPrijs = 1.20,
+    gasPrijs = 1.2,
   } = input;
-  
+
+  // Normaliseer warmwater behoefte
+  const warmwaterBehoefteValue = warmwaterBehoefte ?? "gemiddeld";
+
   // Aanbevolen volume
-  const aanbevolenVolume = getVolumeAdvies(aantalPersonen, warmwaterBehoefte);
-  
+  const aanbevolenVolume = getVolumeAdvies(aantalPersonen, warmwaterBehoefteValue);
+
   // Vermogen advies (kW) - voor opwarmen in redelijke tijd
   // Aanname: 100 liter opwarmen van 10°C naar 60°C in 1 uur ≈ 5.8 kW
   const aanbevolenVermogen = Math.max(2, (aanbevolenVolume / 100) * 5.8);
-  
+
   // Type advies: warmtepompboiler is zuiniger maar duurder
   // Voor 4+ personen of hoog verbruik: warmtepomp
   // Anders: elektrisch
-  const typeAdvies = aantalPersonen >= 4 || warmwaterBehoefte === "hoog" 
-    ? "warmtepomp" 
-    : "elektrisch";
-  
-  // Jaarlijks verbruik
-  const literPerJaar = aantalPersonen * warmwaterBehoeftePerPersoon[warmwaterBehoefte] * 365;
+  const typeAdvies =
+    aantalPersonen >= 4 || warmwaterBehoefteValue === "hoog" ? "warmtepomp" : "elektrisch";
+  const literPerJaar =
+    aantalPersonen * (warmwaterBehoeftePerPersoon[warmwaterBehoefteValue] || 50) * 365;
   const energiePerJaar_kWh = (literPerJaar * 4.186 * 50) / 3600; // 50°C temperatuurverschil
-  
+
   let jaarlijksVerbruik: number;
   let jaarlijkseKosten: number;
-  
+
   if (typeAdvies === "warmtepomp") {
     // Warmtepompboiler: COP ~3, dus 1/3 van energie
     jaarlijksVerbruik = energiePerJaar_kWh / 3;
@@ -70,7 +71,7 @@ export function berekenBoilers(input: BoilersInput): BoilersResult {
     jaarlijksVerbruik = energiePerJaar_kWh;
     jaarlijkseKosten = jaarlijksVerbruik * stroomPrijs;
   }
-  
+
   // Besparing vs CV-boiler
   let besparingVsCv: number | undefined;
   if (huidigSysteem === "cv-boiler") {
@@ -79,16 +80,16 @@ export function berekenBoilers(input: BoilersInput): BoilersResult {
     const cvKosten = cvVerbruik_m3 * gasPrijs;
     besparingVsCv = cvKosten - jaarlijkseKosten;
   }
-  
+
   // Advies tekst
   let advies = `Voor ${aantalPersonen} personen is een ${aanbevolenVolume} liter boiler aanbevolen.`;
   advies += ` Type: ${typeAdvies === "warmtepomp" ? "warmtepompboiler" : "elektrische boiler"}.`;
   advies += ` Jaarlijkse kosten: ongeveer €${Math.round(jaarlijkseKosten)}.`;
-  
+
   if (besparingVsCv && besparingVsCv > 0) {
     advies += ` Besparing ten opzichte van CV-boiler: €${Math.round(besparingVsCv)} per jaar.`;
   }
-  
+
   return {
     aanbevolenVolume,
     aanbevolenVermogen: Math.round(aanbevolenVermogen * 10) / 10,
@@ -99,4 +100,3 @@ export function berekenBoilers(input: BoilersInput): BoilersResult {
     advies,
   };
 }
-

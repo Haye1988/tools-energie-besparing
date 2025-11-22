@@ -1,6 +1,6 @@
 // Basis types voor alle calculators
 
-export type ToolName = 
+export type ToolName =
   | "zonnepanelen"
   | "warmtepomp"
   | "airco"
@@ -37,4 +37,3 @@ export interface AIResponse {
   answer: string;
   sources?: string[];
 }
-

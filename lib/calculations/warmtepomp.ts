@@ -45,47 +45,45 @@ export function berekenWarmtepomp(input: WarmtepompInput): WarmtepompResult {
     stroomPrijs,
     cop = 4,
   } = input;
-  
+
   // Warmtebehoefte in kWh (1 m³ gas ≈ 9.5 kWh)
   const warmteBehoefte_kWh = gasVerbruik * 9.5;
-  
+
   // Correctiefactoren toepassen
   const woningFactor = woningTypeFactoren[woningType] || 1.0;
   const isolatieFactor = isolatieFactoren[isolatieNiveau] || 1.0;
-  
+
   // Gecorrigeerde warmtebehoefte
   const gecorrigeerdeWarmteBehoefte = warmteBehoefte_kWh * woningFactor * isolatieFactor;
-  
+
   // Benodigd vermogen (kW) = (warmtebehoefte × 8) / 1650
   // 1650 = vollasturen per jaar in NL
   const benodigdVermogen = (gecorrigeerdeWarmteBehoefte * 8) / 1650;
-  
+
   // Bij hybride: warmtepomp levert ~60% van warmte, ketel 40%
   // Bij all-electric: warmtepomp levert 100%
   const warmtepompDekking = warmtepompType === "hybride" ? 0.6 : 1.0;
-  
+
   // Warmte geleverd door warmtepomp
   const warmtepompWarmte_kWh = gecorrigeerdeWarmteBehoefte * warmtepompDekking;
-  
+
   // Stroomverbruik warmtepomp (warmte / COP)
   const stroomVerbruik = warmtepompWarmte_kWh / cop;
-  
+
   // Rest gasverbruik (alleen bij hybride)
-  const restGasVerbruik = warmtepompType === "hybride" 
-    ? gasVerbruik * (1 - warmtepompDekking)
-    : 0;
-  
+  const restGasVerbruik = warmtepompType === "hybride" ? gasVerbruik * (1 - warmtepompDekking) : 0;
+
   // Kosten berekening
   const huidigeKosten = gasVerbruik * gasPrijs;
-  const nieuweKosten = (stroomVerbruik * stroomPrijs) + (restGasVerbruik * gasPrijs);
+  const nieuweKosten = stroomVerbruik * stroomPrijs + restGasVerbruik * gasPrijs;
   const nettoBesparing = huidigeKosten - nieuweKosten;
-  
+
   // Gasbesparing
   const gasBesparing = gasVerbruik - restGasVerbruik;
-  
+
   // CO2 reductie (1 m³ gas ≈ 1.8 kg CO2)
   const co2Reductie = gasBesparing * 1.8;
-  
+
   return {
     benodigdVermogen: Math.round(benodigdVermogen * 10) / 10,
     stroomVerbruik: Math.round(stroomVerbruik),
@@ -97,4 +95,3 @@ export function berekenWarmtepomp(input: WarmtepompInput): WarmtepompResult {
     co2Reductie: Math.round(co2Reductie),
   };
 }
-

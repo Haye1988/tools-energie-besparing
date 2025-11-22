@@ -56,25 +56,16 @@ export default function ResultCard({
           <div className="text-3xl">{icon}</div>
         </div>
       )}
-      <h3 className="text-sm font-medium text-totaaladvies-gray-medium mb-3">
-        {title}
-      </h3>
+      <h3 className="text-sm font-medium text-totaaladvies-gray-medium mb-3">{title}</h3>
       <div className="flex items-baseline justify-center gap-2">
         <span className="text-4xl lg:text-5xl font-extrabold text-totaaladvies-blue">
           {formatValue(value)}
         </span>
         {unit && unit !== "€" && unit !== "EUR" && (
-          <span className="text-xl font-medium text-totaaladvies-gray-medium">
-            {unit}
-          </span>
+          <span className="text-xl font-medium text-totaaladvies-gray-medium">{unit}</span>
         )}
       </div>
-      {subtitle && (
-        <p className="text-sm text-totaaladvies-gray-medium mt-3">
-          {subtitle}
-        </p>
-      )}
+      {subtitle && <p className="text-sm text-totaaladvies-gray-medium mt-3">{subtitle}</p>}
     </div>
   );
 }
-

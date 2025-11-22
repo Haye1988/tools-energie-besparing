@@ -54,14 +54,14 @@ const config: Config = {
         },
       },
       borderRadius: {
-        "card": "18px",
-        "input": "12px",
-        "button": "9999px",
+        card: "18px",
+        input: "12px",
+        button: "9999px",
       },
       boxShadow: {
-        "card": "0 4px 8px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04)",
+        card: "0 4px 8px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04)",
         "card-hover": "0 8px 16px -4px rgba(0, 0, 0, 0.1), 0 4px 8px -2px rgba(0, 0, 0, 0.06)",
-        "button": "0 2px 4px rgba(255, 122, 0, 0.2)",
+        button: "0 2px 4px rgba(255, 122, 0, 0.2)",
         "button-hover": "0 4px 8px rgba(255, 122, 0, 0.3)",
       },
       backgroundImage: {
@@ -91,11 +91,10 @@ const config: Config = {
         },
       },
       maxWidth: {
-        "container": "1280px",
+        container: "1280px",
       },
     },
   },
   plugins: [],
 };
 export default config;
-

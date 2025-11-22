@@ -14,17 +14,17 @@ export default function EmbedWrapper({ children }: EmbedWrapperProps) {
     if (embed) {
       // Send initial height
       sendHeightToParent();
-      
+
       // Send height on resize
       const resizeObserver = new ResizeObserver(() => {
         sendHeightToParent();
       });
-      
+
       resizeObserver.observe(document.documentElement);
-      
+
       // Also listen to window resize
       window.addEventListener("resize", sendHeightToParent);
-      
+
       return () => {
         resizeObserver.disconnect();
         window.removeEventListener("resize", sendHeightToParent);
@@ -34,9 +34,5 @@ export default function EmbedWrapper({ children }: EmbedWrapperProps) {
     return undefined;
   }, [embed]);
 
-  return (
-    <div className={embed ? "bg-transparent" : ""}>
-      {children}
-    </div>
-  );
+  return <div className={embed ? "bg-transparent" : ""}>{children}</div>;
 }

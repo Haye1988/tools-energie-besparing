@@ -1,18 +1,18 @@
-import { 
-  Sun, 
-  Wind, 
-  Snowflake, 
-  Battery, 
-  Home, 
-  Flame, 
-  Zap, 
-  FileText, 
-  Window, 
-  Award, 
+import {
+  Sun,
+  Wind,
+  Snowflake,
+  Battery,
+  Home,
+  Flame,
+  Zap,
+  FileText,
+  Square as Window,
+  Award,
   Droplet,
   TrendingUp,
   Euro,
-  Clock
+  Clock,
 } from "lucide-react";
 
 export const calculatorIcons = {
@@ -43,4 +43,3 @@ export const resultIcons = {
   laadtijd: Clock,
   label: Award,
 };
-

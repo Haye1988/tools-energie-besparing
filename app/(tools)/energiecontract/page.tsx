@@ -3,4 +3,3 @@ import EnergiecontractCalculator from "@/components/calculators/EnergiecontractC
 export default function EnergiecontractPage() {
   return <EnergiecontractCalculator />;
 }
-

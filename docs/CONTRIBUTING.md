@@ -80,4 +80,3 @@ docs: update README with new features
 ## Vragen?
 
 Neem contact op met het development team voor vragen of hulp.
-

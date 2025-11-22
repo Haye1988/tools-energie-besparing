@@ -14,7 +14,7 @@ export default function BoilersCalculator() {
     warmwaterBehoefte: "gemiddeld",
     huidigSysteem: "cv-boiler",
     stroomPrijs: 0.27,
-    gasPrijs: 1.20,
+    gasPrijs: 1.2,
   });
 
   const result = useMemo(() => {
@@ -36,10 +36,8 @@ export default function BoilersCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         <div className="space-y-6">
           <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">
-              Jouw gegevens
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
+
             <div className="space-y-5">
               <InputField
                 label="Aantal personen"
@@ -52,7 +50,7 @@ export default function BoilersCalculator() {
                 step={1}
                 unit="personen"
               />
-              
+
               <SelectField
                 label="Warmwater behoefte"
                 name="warmwaterBehoefte"
@@ -64,7 +62,7 @@ export default function BoilersCalculator() {
                   { value: "hoog", label: "Hoog" },
                 ]}
               />
-              
+
               <SelectField
                 label="Huidig systeem"
                 name="huidigSysteem"
@@ -76,7 +74,7 @@ export default function BoilersCalculator() {
                   { value: "geen", label: "Geen boiler" },
                 ]}
               />
-              
+
               <InputField
                 label="Stroomprijs"
                 name="stroomPrijs"
@@ -87,12 +85,12 @@ export default function BoilersCalculator() {
                 step={0.01}
                 unit="€/kWh"
               />
-              
+
               <InputField
                 label="Gasprijs"
                 name="gasPrijs"
                 type="number"
-                value={input.gasPrijs ?? 1.20}
+                value={input.gasPrijs ?? 1.2}
                 onChange={(val) => setInput({ ...input, gasPrijs: Number(val) })}
                 min={0}
                 step={0.01}
@@ -101,7 +99,7 @@ export default function BoilersCalculator() {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-6">
           {result && (
             <>
@@ -112,21 +110,21 @@ export default function BoilersCalculator() {
                   unit="liter"
                   variant="info"
                 />
-                
+
                 <ResultCard
                   title="Aanbevolen vermogen"
                   value={result.aanbevolenVermogen}
                   unit="kW"
                   variant="info"
                 />
-                
+
                 <ResultCard
                   title="Jaarlijkse kosten"
                   value={result.jaarlijkseKosten}
                   unit="€"
                   variant="warning"
                 />
-                
+
                 {result.besparingVsCv && result.besparingVsCv > 0 && (
                   <ResultCard
                     title="Besparing vs CV"
@@ -136,14 +134,13 @@ export default function BoilersCalculator() {
                   />
                 )}
               </div>
-              
+
               <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Advies
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Advies</h3>
                 <div className="space-y-3 text-gray-700">
                   <p>
-                    <strong>Type:</strong> {result.typeAdvies === "warmtepomp" ? "Warmtepompboiler" : "Elektrische boiler"}
+                    <strong>Type:</strong>{" "}
+                    {result.typeAdvies === "warmtepomp" ? "Warmtepompboiler" : "Elektrische boiler"}
                   </p>
                   <p>
                     <strong>Volume:</strong> {result.aanbevolenVolume} liter
@@ -158,15 +155,10 @@ export default function BoilersCalculator() {
                     <strong>Jaarlijkse kosten:</strong> €{result.jaarlijkseKosten.toFixed(2)}
                   </p>
                 </div>
-                <p className="mt-4 text-gray-700">
-                  {result.advies}
-                </p>
+                <p className="mt-4 text-gray-700">{result.advies}</p>
               </div>
-              
-              <LeadForm
-                tool="boilers"
-                results={result}
-              />
+
+              <LeadForm tool="boilers" results={result} />
             </>
           )}
         </div>
@@ -174,4 +166,3 @@ export default function BoilersCalculator() {
     </CalculatorLayout>
   );
 }
-

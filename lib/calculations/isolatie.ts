@@ -61,20 +61,14 @@ const besparingData: Record<string, Record<string, number>> = {
 };
 
 export function berekenIsolatie(input: IsolatieInput): IsolatieResult {
-  const {
-    woningType,
-    gasVerbruik,
-    maatregelen,
-    huidigGlasType = "dubbel",
-    gasPrijs = 1.20,
-  } = input;
-  
+  const { woningType, gasVerbruik, maatregelen, huidigGlasType = "dubbel", gasPrijs = 1.2 } = input;
+
   const resultaten: IsolatieMaatregelResult[] = [];
   let totaalGasBesparing = 0;
-  
+
   for (const maatregel of maatregelen) {
     let gasBesparing = 0;
-    
+
     if (maatregel === "glas") {
       // Bepaal welke glas besparing te gebruiken
       const glasKey = huidigGlasType === "enkel" ? "glasEnkel" : "glasDubbel";
@@ -82,26 +76,26 @@ export function berekenIsolatie(input: IsolatieInput): IsolatieResult {
     } else {
       gasBesparing = besparingData[maatregel]?.[woningType] || 0;
     }
-    
+
     if (gasBesparing > 0) {
       const kostenBesparing = gasBesparing * gasPrijs;
       const co2Reductie = gasBesparing * 1.8; // 1 m³ gas ≈ 1.8 kg CO2
-      
+
       resultaten.push({
         maatregel,
         gasBesparing: Math.round(gasBesparing),
         kostenBesparing: Math.round(kostenBesparing * 100) / 100,
         co2Reductie: Math.round(co2Reductie),
       });
-      
+
       totaalGasBesparing += gasBesparing;
     }
   }
-  
+
   const totaalKostenBesparing = totaalGasBesparing * gasPrijs;
   const totaalCo2Reductie = totaalGasBesparing * 1.8;
   const nieuwGasVerbruik = Math.max(0, gasVerbruik - totaalGasBesparing);
-  
+
   return {
     maatregelen: resultaten,
     totaalGasBesparing: Math.round(totaalGasBesparing),
@@ -110,4 +104,3 @@ export function berekenIsolatie(input: IsolatieInput): IsolatieResult {
     nieuwGasVerbruik: Math.round(nieuwGasVerbruik),
   };
 }
-

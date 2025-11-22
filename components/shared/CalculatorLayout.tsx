@@ -47,7 +47,7 @@ export default function CalculatorLayout({
             </div>
           </header>
         )}
-        
+
         <div className="container mx-auto max-w-container px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           {!embed && (
             <>
@@ -70,15 +70,12 @@ export default function CalculatorLayout({
               </div>
             </>
           )}
-          
-          <div className="max-w-6xl mx-auto">
-            {children}
-          </div>
+
+          <div className="max-w-6xl mx-auto">{children}</div>
         </div>
       </div>
-      
+
       {!embed && <AIChat tool={tool} context={context} />}
     </EmbedWrapper>
   );
 }
-

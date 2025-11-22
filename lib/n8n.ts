@@ -51,4 +51,3 @@ export async function sendLeadToN8N(data: LeadData): Promise<N8NResponse> {
     };
   }
 }
-

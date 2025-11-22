@@ -24,7 +24,7 @@ export interface CvKetelResult {
 // Rendement per keteltype
 const rendementen: Record<string, number> = {
   oud: 0.75, // 75%
-  redelijk: 0.90, // 90%
+  redelijk: 0.9, // 90%
   nieuw: 0.96, // 96%
 };
 
@@ -41,31 +41,31 @@ export function berekenCvKetel(input: CvKetelInput): CvKetelResult {
     huidigKetelType,
     aantalPersonen,
     gewenstSysteem,
-    gasPrijs = 1.20,
+    gasPrijs = 1.2,
     stroomPrijs = 0.27,
   } = input;
-  
+
   // Huidig rendement
-  const huidigRendement = rendementen[huidigKetelType] || 0.90;
-  
+  const huidigRendement = rendementen[huidigKetelType] || 0.9;
+
   // Nieuw rendement (HR-ketel)
   const nieuwRendement = 0.96; // 96%
-  
+
   // Benodigd vermogen voor verwarming
   // (gasverbruik × 8) / 1650 = kW
   const benodigdVermogen = (gasVerbruik * 8) / 1650;
-  
+
   // Tapwater advies
   const tapwaterAdvies = getTapwaterAdvies(aantalPersonen);
-  
+
   // Gasbesparing door efficiëntere ketel
   // Factor = 1 - (huidig rendement / nieuw rendement)
-  const besparingsFactor = 1 - (huidigRendement / nieuwRendement);
+  const besparingsFactor = 1 - huidigRendement / nieuwRendement;
   const gasBesparing = gasVerbruik * besparingsFactor;
-  
+
   // Kostenbesparing
   const kostenBesparing = gasBesparing * gasPrijs;
-  
+
   // Hybride advies (als gekozen)
   let hybrideAdvies;
   if (gewenstSysteem === "hybride") {
@@ -77,15 +77,15 @@ export function berekenCvKetel(input: CvKetelInput): CvKetelResult {
     const hybrideStroomKosten = hybrideStroomVerbruik * stroomPrijs;
     const hybrideGasKosten = (gasVerbruik - hybrideGasBesparing) * gasPrijs;
     const hybrideNieuweKosten = hybrideStroomKosten + hybrideGasKosten;
-    const hybrideKostenBesparing = (gasVerbruik * gasPrijs) - hybrideNieuweKosten;
-    
+    const hybrideKostenBesparing = gasVerbruik * gasPrijs - hybrideNieuweKosten;
+
     hybrideAdvies = {
       warmtepompVermogen: Math.round(hybrideWarmtepompVermogen * 10) / 10,
       gasBesparing: Math.round(hybrideGasBesparing),
       kostenBesparing: Math.round(hybrideKostenBesparing * 100) / 100,
     };
   }
-  
+
   return {
     benodigdVermogen: Math.round(benodigdVermogen * 10) / 10,
     tapwaterAdvies,
@@ -96,4 +96,3 @@ export function berekenCvKetel(input: CvKetelInput): CvKetelResult {
     hybrideAdvies,
   };
 }
-

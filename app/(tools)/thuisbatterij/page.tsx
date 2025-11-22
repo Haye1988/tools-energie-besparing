@@ -3,4 +3,3 @@ import ThuisbatterijCalculator from "@/components/calculators/ThuisbatterijCalcu
 export default function ThuisbatterijPage() {
   return <ThuisbatterijCalculator />;
 }
-

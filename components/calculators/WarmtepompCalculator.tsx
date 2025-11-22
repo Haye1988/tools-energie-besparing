@@ -14,7 +14,7 @@ export default function WarmtepompCalculator() {
     woningType: "tussenwoning",
     isolatieNiveau: "matig",
     warmtepompType: "hybride",
-    gasPrijs: 1.20,
+    gasPrijs: 1.2,
     stroomPrijs: 0.27,
   });
 
@@ -37,10 +37,8 @@ export default function WarmtepompCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         <div className="space-y-6">
           <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">
-              Jouw gegevens
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
+
             <div className="space-y-5">
               <InputField
                 label="Jaarlijks gasverbruik"
@@ -52,7 +50,7 @@ export default function WarmtepompCalculator() {
                 step={100}
                 unit="m³/jaar"
               />
-              
+
               <SelectField
                 label="Woningtype"
                 name="woningType"
@@ -66,7 +64,7 @@ export default function WarmtepompCalculator() {
                   { value: "vrijstaand", label: "Vrijstaand" },
                 ]}
               />
-              
+
               <SelectField
                 label="Isolatieniveau"
                 name="isolatieNiveau"
@@ -78,7 +76,7 @@ export default function WarmtepompCalculator() {
                   { value: "goed", label: "Goed" },
                 ]}
               />
-              
+
               <SelectField
                 label="Warmtepomp type"
                 name="warmtepompType"
@@ -89,7 +87,7 @@ export default function WarmtepompCalculator() {
                   { value: "all-electric", label: "All-electric" },
                 ]}
               />
-              
+
               <InputField
                 label="Gasprijs"
                 name="gasPrijs"
@@ -100,7 +98,7 @@ export default function WarmtepompCalculator() {
                 step={0.01}
                 unit="€/m³"
               />
-              
+
               <InputField
                 label="Stroomprijs"
                 name="stroomPrijs"
@@ -114,7 +112,7 @@ export default function WarmtepompCalculator() {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-6">
           {result && (
             <>
@@ -125,14 +123,14 @@ export default function WarmtepompCalculator() {
                   unit="kW"
                   variant="info"
                 />
-                
+
                 <ResultCard
                   title="Stroomverbruik"
                   value={result.stroomVerbruik}
                   unit="kWh/jaar"
                   variant="info"
                 />
-                
+
                 {result.restGasVerbruik > 0 && (
                   <ResultCard
                     title="Rest gasverbruik"
@@ -141,7 +139,7 @@ export default function WarmtepompCalculator() {
                     variant="warning"
                   />
                 )}
-                
+
                 <ResultCard
                   title="Netto besparing"
                   value={result.nettoBesparing}
@@ -149,31 +147,42 @@ export default function WarmtepompCalculator() {
                   variant={result.nettoBesparing > 0 ? "success" : "warning"}
                 />
               </div>
-              
+
               <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Resultaat
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Resultaat</h3>
                 <div className="space-y-3 text-gray-700">
                   <p>
-                    <strong>Huidige kosten:</strong> €{result.huidigeKosten.toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/jaar
+                    <strong>Huidige kosten:</strong> €
+                    {result.huidigeKosten.toLocaleString("nl-NL", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    /jaar
                   </p>
                   <p>
-                    <strong>Nieuwe kosten:</strong> €{result.nieuweKosten.toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/jaar
+                    <strong>Nieuwe kosten:</strong> €
+                    {result.nieuweKosten.toLocaleString("nl-NL", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    /jaar
                   </p>
                   <p>
-                    <strong>Besparing:</strong> €{result.nettoBesparing.toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/jaar
+                    <strong>Besparing:</strong> €
+                    {result.nettoBesparing.toLocaleString("nl-NL", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    /jaar
                   </p>
                   <p>
-                    <strong>Gasbesparing:</strong> {result.gasBesparing} m³/jaar ({result.co2Reductie} kg CO₂ minder)
+                    <strong>Gasbesparing:</strong> {result.gasBesparing} m³/jaar (
+                    {result.co2Reductie} kg CO₂ minder)
                   </p>
                 </div>
               </div>
-              
-              <LeadForm
-                tool="warmtepomp"
-                results={result}
-              />
+
+              <LeadForm tool="warmtepomp" results={result} />
             </>
           )}
         </div>
@@ -181,4 +190,3 @@ export default function WarmtepompCalculator() {
     </CalculatorLayout>
   );
 }
-

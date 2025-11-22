@@ -22,7 +22,9 @@ test.describe("Zonnepanelen Calculator", () => {
 
   test("should show lead form", async ({ page }) => {
     // Scroll to lead form
-    await page.getByRole("heading", { name: /Ontvang een vrijblijvend advies/i }).scrollIntoViewIfNeeded();
+    await page
+      .getByRole("heading", { name: /Ontvang een vrijblijvend advies/i })
+      .scrollIntoViewIfNeeded();
     await expect(page.getByLabel(/E-mailadres/i)).toBeVisible();
     await expect(page.getByLabel(/Postcode/i)).toBeVisible();
   });
@@ -31,4 +33,3 @@ test.describe("Zonnepanelen Calculator", () => {
     await expect(page.getByRole("link", { name: /Terug naar overzicht/i })).toBeVisible();
   });
 });
-

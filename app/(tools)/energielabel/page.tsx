@@ -3,4 +3,3 @@ import EnergielabelCalculator from "@/components/calculators/EnergielabelCalcula
 export default function EnergielabelPage() {
   return <EnergielabelCalculator />;
 }
-

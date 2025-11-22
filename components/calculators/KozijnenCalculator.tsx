@@ -14,7 +14,7 @@ export default function KozijnenCalculator() {
     huidigGlasType: "dubbel",
     kozijnMateriaal: "kunststof",
     gasVerbruik: 1200,
-    gasPrijs: 1.20,
+    gasPrijs: 1.2,
   });
 
   const result = useMemo(() => {
@@ -36,10 +36,8 @@ export default function KozijnenCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         <div className="space-y-6">
           <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">
-              Jouw gegevens
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
+
             <div className="space-y-5">
               <InputField
                 label="Oppervlakte ramen"
@@ -51,7 +49,7 @@ export default function KozijnenCalculator() {
                 step={1}
                 unit="m²"
               />
-              
+
               <SelectField
                 label="Huidig glastype"
                 name="huidigGlasType"
@@ -63,7 +61,7 @@ export default function KozijnenCalculator() {
                   { value: "hr", label: "HR glas" },
                 ]}
               />
-              
+
               <SelectField
                 label="Kozijn materiaal"
                 name="kozijnMateriaal"
@@ -75,7 +73,7 @@ export default function KozijnenCalculator() {
                   { value: "aluminium", label: "Aluminium" },
                 ]}
               />
-              
+
               <InputField
                 label="Jaarlijks gasverbruik"
                 name="gasVerbruik"
@@ -86,12 +84,12 @@ export default function KozijnenCalculator() {
                 step={100}
                 unit="m³/jaar"
               />
-              
+
               <InputField
                 label="Gasprijs"
                 name="gasPrijs"
                 type="number"
-                value={input.gasPrijs ?? 1.20}
+                value={input.gasPrijs ?? 1.2}
                 onChange={(val) => setInput({ ...input, gasPrijs: Number(val) })}
                 min={0}
                 step={0.01}
@@ -100,7 +98,7 @@ export default function KozijnenCalculator() {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-6">
           {result && (
             <>
@@ -111,28 +109,28 @@ export default function KozijnenCalculator() {
                   unit="W/m²K"
                   variant="warning"
                 />
-                
+
                 <ResultCard
                   title="Nieuwe U-waarde"
                   value={result.nieuweUWaarde}
                   unit="W/m²K"
                   variant="success"
                 />
-                
+
                 <ResultCard
                   title="Gasbesparing"
                   value={result.gasBesparing}
                   unit="m³/jaar"
                   variant="success"
                 />
-                
+
                 <ResultCard
                   title="Kostenbesparing"
                   value={result.kostenBesparing}
                   unit="€/jaar"
                   variant="success"
                 />
-                
+
                 <ResultCard
                   title="CO₂ reductie"
                   value={result.co2Reductie}
@@ -140,20 +138,13 @@ export default function KozijnenCalculator() {
                   variant="info"
                 />
               </div>
-              
+
               <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Comfort verbetering
-                </h3>
-                <p className="text-gray-700">
-                  {result.comfortVerbetering}
-                </p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Comfort verbetering</h3>
+                <p className="text-gray-700">{result.comfortVerbetering}</p>
               </div>
-              
-              <LeadForm
-                tool="kozijnen"
-                results={result}
-              />
+
+              <LeadForm tool="kozijnen" results={result} />
             </>
           )}
         </div>
@@ -161,4 +152,3 @@ export default function KozijnenCalculator() {
     </CalculatorLayout>
   );
 }
-

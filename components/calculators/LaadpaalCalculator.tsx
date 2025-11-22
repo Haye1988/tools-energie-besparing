@@ -36,10 +36,8 @@ export default function LaadpaalCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         <div className="space-y-6">
           <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">
-              Jouw gegevens
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
+
             <div className="space-y-5">
               <InputField
                 label="Accucapaciteit auto"
@@ -51,7 +49,7 @@ export default function LaadpaalCalculator() {
                 step={5}
                 unit="kWh"
               />
-              
+
               <InputField
                 label="Gewenste laadtijd"
                 name="gewensteLaadtijd"
@@ -63,7 +61,7 @@ export default function LaadpaalCalculator() {
                 step={1}
                 unit="uren"
               />
-              
+
               <SelectField
                 label="Huisaansluiting"
                 name="huisaansluiting"
@@ -74,7 +72,7 @@ export default function LaadpaalCalculator() {
                   { value: "3-fase", label: "3-fase (400V)" },
                 ]}
               />
-              
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -87,7 +85,7 @@ export default function LaadpaalCalculator() {
                   Ik heb zonnepanelen
                 </label>
               </div>
-              
+
               <InputField
                 label="Stroomprijs"
                 name="stroomPrijs"
@@ -101,7 +99,7 @@ export default function LaadpaalCalculator() {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-6">
           {result && (
             <>
@@ -112,14 +110,14 @@ export default function LaadpaalCalculator() {
                   unit="kW"
                   variant="info"
                 />
-                
+
                 <ResultCard
                   title="Laadtijd bij advies"
                   value={result.laadtijdBijAdvies}
                   unit="uren"
                   variant="info"
                 />
-                
+
                 <ResultCard
                   title="Kosten per lading"
                   value={result.kostenPerLading}
@@ -127,7 +125,7 @@ export default function LaadpaalCalculator() {
                   variant="warning"
                 />
               </div>
-              
+
               <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Laadtijden bij verschillende vermogens
@@ -138,20 +136,13 @@ export default function LaadpaalCalculator() {
                   <p>Bij 11 kW: {result.laadtijdBij11kW.toFixed(1)} uur</p>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Advies
-                </h3>
-                <p className="text-gray-700">
-                  {result.advies}
-                </p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Advies</h3>
+                <p className="text-gray-700">{result.advies}</p>
               </div>
-              
-              <LeadForm
-                tool="laadpaal"
-                results={result}
-              />
+
+              <LeadForm tool="laadpaal" results={result} />
             </>
           )}
         </div>
@@ -159,4 +150,3 @@ export default function LaadpaalCalculator() {
     </CalculatorLayout>
   );
 }
-

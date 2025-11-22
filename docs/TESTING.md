@@ -62,4 +62,3 @@ Streef naar minimaal 80% code coverage voor calculation functions.
 3. Gebruik descriptive test names
 4. Keep tests isolated en independent
 5. Mock external dependencies waar nodig
-

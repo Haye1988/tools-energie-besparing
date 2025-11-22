@@ -10,9 +10,9 @@ import LeadForm from "@/components/shared/LeadForm";
 export default function EnergiecontractCalculator() {
   const [input, setInput] = useState<EnergiecontractInput>({
     huidigStroomPrijs: 0.35,
-    huidigGasPrijs: 1.50,
+    huidigGasPrijs: 1.5,
     nieuwStroomPrijs: 0.27,
-    nieuwGasPrijs: 1.20,
+    nieuwGasPrijs: 1.2,
     jaarverbruikStroom: 2500,
     jaarverbruikGas: 1000,
   });
@@ -36,10 +36,8 @@ export default function EnergiecontractCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         <div className="space-y-6">
           <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">
-              Huidig contract
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Huidig contract</h2>
+
             <div className="space-y-5">
               <InputField
                 label="Stroomprijs"
@@ -51,7 +49,7 @@ export default function EnergiecontractCalculator() {
                 step={0.01}
                 unit="€/kWh"
               />
-              
+
               <InputField
                 label="Gasprijs"
                 name="huidigGasPrijs"
@@ -64,12 +62,10 @@ export default function EnergiecontractCalculator() {
               />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">
-              Nieuw contract
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Nieuw contract</h2>
+
             <div className="space-y-5">
               <InputField
                 label="Stroomprijs"
@@ -81,7 +77,7 @@ export default function EnergiecontractCalculator() {
                 step={0.01}
                 unit="€/kWh"
               />
-              
+
               <InputField
                 label="Gasprijs"
                 name="nieuwGasPrijs"
@@ -94,12 +90,10 @@ export default function EnergiecontractCalculator() {
               />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">
-              Verbruik
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Verbruik</h2>
+
             <div className="space-y-5">
               <InputField
                 label="Jaarverbruik stroom"
@@ -111,7 +105,7 @@ export default function EnergiecontractCalculator() {
                 step={100}
                 unit="kWh/jaar"
               />
-              
+
               <InputField
                 label="Jaarverbruik gas"
                 name="jaarverbruikGas"
@@ -125,7 +119,7 @@ export default function EnergiecontractCalculator() {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-6">
           {result && (
             <>
@@ -136,21 +130,21 @@ export default function EnergiecontractCalculator() {
                   unit="€/jaar"
                   variant="warning"
                 />
-                
+
                 <ResultCard
                   title="Nieuwe kosten"
                   value={result.nieuweKosten}
                   unit="€/jaar"
                   variant="info"
                 />
-                
+
                 <ResultCard
                   title="Verschil"
                   value={result.verschil}
                   unit="€/jaar"
                   variant={result.verschil < 0 ? "success" : "warning"}
                 />
-                
+
                 <ResultCard
                   title="Maandelijks verschil"
                   value={result.maandelijksVerschil}
@@ -158,18 +152,17 @@ export default function EnergiecontractCalculator() {
                   variant={result.verschil < 0 ? "success" : "warning"}
                 />
               </div>
-              
+
               <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Vergelijking
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Vergelijking</h3>
                 <div className="space-y-3 text-gray-700">
                   <div>
                     <p className="font-medium">Stroom:</p>
                     <p>Huidig: €{result.stroomKostenHuidig.toFixed(2)}/jaar</p>
                     <p>Nieuw: €{result.stroomKostenNieuw.toFixed(2)}/jaar</p>
                     <p className="text-sm text-gray-600">
-                      Verschil: €{(result.stroomKostenNieuw - result.stroomKostenHuidig).toFixed(2)}/jaar
+                      Verschil: €{(result.stroomKostenNieuw - result.stroomKostenHuidig).toFixed(2)}
+                      /jaar
                     </p>
                   </div>
                   <div>
@@ -182,19 +175,15 @@ export default function EnergiecontractCalculator() {
                   </div>
                   <div className="pt-3 border-t border-gray-200">
                     <p className="font-semibold">
-                      {result.verschil < 0 
+                      {result.verschil < 0
                         ? `Je bespaart €${Math.abs(result.verschil).toFixed(2)} per jaar (${Math.abs(result.verschilPercentage).toFixed(1)}%)`
-                        : `Het nieuwe contract is €${result.verschil.toFixed(2)} duurder per jaar`
-                      }
+                        : `Het nieuwe contract is €${result.verschil.toFixed(2)} duurder per jaar`}
                     </p>
                   </div>
                 </div>
               </div>
-              
-              <LeadForm
-                tool="energiecontract"
-                results={result}
-              />
+
+              <LeadForm tool="energiecontract" results={result} />
             </>
           )}
         </div>
@@ -202,4 +191,3 @@ export default function EnergiecontractCalculator() {
     </CalculatorLayout>
   );
 }
-

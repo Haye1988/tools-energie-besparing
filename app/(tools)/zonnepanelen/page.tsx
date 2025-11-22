@@ -3,4 +3,3 @@ import ZonnepanelenCalculator from "@/components/calculators/ZonnepanelenCalcula
 export default function ZonnepanelenPage() {
   return <ZonnepanelenCalculator />;
 }
-

@@ -37,10 +37,8 @@ export default function AircoCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         <div className="space-y-6">
           <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">
-              Jouw gegevens
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
+
             <div className="space-y-5">
               <InputField
                 label="Oppervlakte ruimte"
@@ -52,7 +50,7 @@ export default function AircoCalculator() {
                 step={1}
                 unit="m²"
               />
-              
+
               <InputField
                 label="Plafondhoogte"
                 name="hoogte"
@@ -64,7 +62,7 @@ export default function AircoCalculator() {
                 step={0.1}
                 unit="m"
               />
-              
+
               <SelectField
                 label="Isolatieniveau"
                 name="isolatieNiveau"
@@ -76,7 +74,7 @@ export default function AircoCalculator() {
                   { value: "slecht", label: "Slecht geïsoleerd / veel ramen" },
                 ]}
               />
-              
+
               <SelectField
                 label="Toepassing"
                 name="toepassing"
@@ -87,7 +85,7 @@ export default function AircoCalculator() {
                   { value: "koelen-verwarmen", label: "Koelen + verwarmen" },
                 ]}
               />
-              
+
               <InputField
                 label="Koeluren per jaar"
                 name="koelurenPerJaar"
@@ -98,7 +96,7 @@ export default function AircoCalculator() {
                 step={100}
                 unit="uren"
               />
-              
+
               <InputField
                 label="Stroomprijs"
                 name="stroomPrijs"
@@ -112,7 +110,7 @@ export default function AircoCalculator() {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-6">
           {result && (
             <>
@@ -123,21 +121,21 @@ export default function AircoCalculator() {
                   unit="kW"
                   variant="info"
                 />
-                
+
                 <ResultCard
                   title="Benodigd vermogen"
                   value={Math.round(result.benodigdVermogenBTU / 1000)}
                   unit="k BTU"
                   variant="info"
                 />
-                
+
                 <ResultCard
                   title="Jaarlijks verbruik"
                   value={result.jaarlijksVerbruik}
                   unit="kWh"
                   variant="warning"
                 />
-                
+
                 <ResultCard
                   title="Jaarlijkse kosten"
                   value={result.jaarlijkseKosten}
@@ -145,23 +143,14 @@ export default function AircoCalculator() {
                   variant="warning"
                 />
               </div>
-              
+
               <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Advies
-                </h3>
-                <p className="text-gray-700 mb-4">
-                  {result.advies}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Ruimte inhoud: {result.ruimteInhoud} m³
-                </p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Advies</h3>
+                <p className="text-gray-700 mb-4">{result.advies}</p>
+                <p className="text-sm text-gray-600">Ruimte inhoud: {result.ruimteInhoud} m³</p>
               </div>
-              
-              <LeadForm
-                tool="airco"
-                results={result}
-              />
+
+              <LeadForm tool="airco" results={result} />
             </>
           )}
         </div>
@@ -169,4 +158,3 @@ export default function AircoCalculator() {
     </CalculatorLayout>
   );
 }
-

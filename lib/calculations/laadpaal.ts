@@ -17,8 +17,10 @@ export interface LaadpaalResult {
   advies: string;
 }
 
-// Standaard laadvermogens
-const _laadvermogens = {
+// Standaard laadvermogens (voor toekomstig gebruik)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// @ts-expect-error - Reserved for future use
+const _laadvermogens: Record<string, Record<string, number>> = {
   "1-fase": {
     "16A": 3.7, // kW
     "32A": 7.4, // kW
@@ -30,19 +32,14 @@ const _laadvermogens = {
 };
 
 export function berekenLaadpaal(input: LaadpaalInput): LaadpaalResult {
-  const {
-    accuCapaciteit,
-    gewensteLaadtijd,
-    huisaansluiting,
-    stroomPrijs = 0.27,
-  } = input;
-  
+  const { accuCapaciteit, gewensteLaadtijd, huisaansluiting, stroomPrijs = 0.27 } = input;
+
   // Benodigd vermogen om in gewenste tijd te laden
   const benodigdVermogen = accuCapaciteit / gewensteLaadtijd;
-  
+
   // Advies vermogen op basis van beschikbare aansluiting
   let adviesVermogen: number;
-  
+
   if (huisaansluiting === "1-fase") {
     if (benodigdVermogen <= 3.7) {
       adviesVermogen = 3.7;
@@ -63,28 +60,28 @@ export function berekenLaadpaal(input: LaadpaalInput): LaadpaalResult {
       adviesVermogen = 22; // Max voor 3-fase
     }
   }
-  
+
   // Laadtijden bij verschillende vermogens
   const laadtijdBijAdvies = accuCapaciteit / adviesVermogen;
   const laadtijdBij3_7kW = accuCapaciteit / 3.7;
   const laadtijdBij7_4kW = accuCapaciteit / 7.4;
   const laadtijdBij11kW = accuCapaciteit / 11;
-  
+
   // Kosten per volledige lading
   const kostenPerLading = accuCapaciteit * stroomPrijs;
-  
+
   // Advies tekst
   let advies = `Voor een ${accuCapaciteit} kWh accu en gewenste laadtijd van ${gewensteLaadtijd} uur is een ${adviesVermogen} kW laadpaal aanbevolen.`;
   advies += ` Hiermee duurt volledig laden ongeveer ${Math.round(laadtijdBijAdvies * 10) / 10} uur.`;
-  
+
   if (huisaansluiting === "1-fase" && benodigdVermogen > 7.4) {
     advies += " Voor sneller laden is een 3-fase aansluiting nodig.";
   }
-  
+
   if (input.zonnepanelen) {
     advies += " Met zonnepanelen kun je overdag laden op eigen zonnestroom voor extra besparing.";
   }
-  
+
   return {
     benodigdVermogen: Math.round(benodigdVermogen * 10) / 10,
     adviesVermogen: Math.round(adviesVermogen * 10) / 10,
@@ -96,4 +93,3 @@ export function berekenLaadpaal(input: LaadpaalInput): LaadpaalResult {
     advies,
   };
 }
-

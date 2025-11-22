@@ -15,7 +15,7 @@ export default function ZonnepanelenCalculator() {
     dakOrientatie: "zuid",
     dakHellingshoek: 35,
     paneelVermogen: 400,
-    stroomPrijs: 0.30,
+    stroomPrijs: 0.3,
   });
 
   const result = useMemo(() => {
@@ -37,10 +37,8 @@ export default function ZonnepanelenCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:gap-12">
         <div className="space-y-6">
           <div className="bg-white rounded-card border border-gray-100 p-6 lg:p-8 lg:p-8 shadow-card animate-slide-up">
-            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">
-              Jouw gegevens
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
+
             <div className="space-y-5">
               <InputField
                 label="Jaarlijks stroomverbruik"
@@ -52,7 +50,7 @@ export default function ZonnepanelenCalculator() {
                 step={100}
                 unit="kWh/jaar"
               />
-              
+
               <SelectField
                 label="Dakoriëntatie"
                 name="dakOrientatie"
@@ -67,7 +65,7 @@ export default function ZonnepanelenCalculator() {
                   { value: "noord", label: "Noord" },
                 ]}
               />
-              
+
               <InputField
                 label="Dakhellingshoek"
                 name="dakHellingshoek"
@@ -79,7 +77,7 @@ export default function ZonnepanelenCalculator() {
                 step={5}
                 unit="°"
               />
-              
+
               <InputField
                 label="Vermogen per paneel"
                 name="paneelVermogen"
@@ -91,7 +89,7 @@ export default function ZonnepanelenCalculator() {
                 step={50}
                 unit="Wp"
               />
-              
+
               <InputField
                 label="Stroomprijs"
                 name="stroomPrijs"
@@ -106,7 +104,7 @@ export default function ZonnepanelenCalculator() {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-6">
           {result && (
             <>
@@ -118,7 +116,7 @@ export default function ZonnepanelenCalculator() {
                   icon={<Sun className="w-8 h-8" />}
                   variant="info"
                 />
-                
+
                 <ResultCard
                   title="Vermogen"
                   value={result.benodigdVermogen}
@@ -126,7 +124,7 @@ export default function ZonnepanelenCalculator() {
                   icon={<Zap className="w-8 h-8" />}
                   variant="info"
                 />
-                
+
                 <ResultCard
                   title="Jaarlijkse opwekking"
                   value={result.jaarlijkseOpwekking}
@@ -134,7 +132,7 @@ export default function ZonnepanelenCalculator() {
                   icon={<TrendingUp className="w-8 h-8" />}
                   variant="success"
                 />
-                
+
                 <ResultCard
                   title="Jaarlijkse besparing"
                   value={result.jaarlijkseBesparing}
@@ -143,27 +141,40 @@ export default function ZonnepanelenCalculator() {
                   variant="success"
                 />
               </div>
-              
+
               <div className="bg-white rounded-card border border-gray-100 p-6 lg:p-8 lg:p-8 shadow-card animate-slide-up">
-                <h3 className="text-xl font-bold text-totaaladvies-blue mb-4">
-                  Resultaat
-                </h3>
+                <h3 className="text-xl font-bold text-totaaladvies-blue mb-4">Resultaat</h3>
                 <div className="space-y-3 text-totaaladvies-gray-medium">
                   <p>
-                    Met <strong className="text-totaaladvies-blue">{result.aantalPanelen} zonnepanelen</strong> van {input.paneelVermogen} Wp wek je ongeveer{" "}
-                    <strong className="text-totaaladvies-blue">{result.jaarlijkseOpwekking.toLocaleString("nl-NL")} kWh</strong> per jaar op.
-                    Dit dekt <strong className="text-totaaladvies-blue">{result.dekkingPercentage.toFixed(1)}%</strong> van je verbruik.
+                    Met{" "}
+                    <strong className="text-totaaladvies-blue">
+                      {result.aantalPanelen} zonnepanelen
+                    </strong>{" "}
+                    van {input.paneelVermogen} Wp wek je ongeveer{" "}
+                    <strong className="text-totaaladvies-blue">
+                      {result.jaarlijkseOpwekking.toLocaleString("nl-NL")} kWh
+                    </strong>{" "}
+                    per jaar op. Dit dekt{" "}
+                    <strong className="text-totaaladvies-blue">
+                      {result.dekkingPercentage.toFixed(1)}%
+                    </strong>{" "}
+                    van je verbruik.
                   </p>
                   <p>
-                    Je bespaart ongeveer <strong className="text-totaaladvies-orange text-lg">€{result.jaarlijkseBesparing.toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> per jaar aan stroomkosten.
+                    Je bespaart ongeveer{" "}
+                    <strong className="text-totaaladvies-orange text-lg">
+                      €
+                      {result.jaarlijkseBesparing.toLocaleString("nl-NL", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </strong>{" "}
+                    per jaar aan stroomkosten.
                   </p>
                 </div>
               </div>
-              
-              <LeadForm
-                tool="zonnepanelen"
-                results={result}
-              />
+
+              <LeadForm tool="zonnepanelen" results={result} />
             </>
           )}
         </div>
@@ -171,4 +182,3 @@ export default function ZonnepanelenCalculator() {
     </CalculatorLayout>
   );
 }
-

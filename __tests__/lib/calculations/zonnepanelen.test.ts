@@ -29,9 +29,7 @@ describe("berekenZonnepanelen", () => {
     const southResult = berekenZonnepanelen(baseInput);
     const northResult = berekenZonnepanelen(northInput);
 
-    expect(northResult.jaarlijkseOpwekking).toBeLessThan(
-      southResult.jaarlijkseOpwekking
-    );
+    expect(northResult.jaarlijkseOpwekking).toBeLessThan(southResult.jaarlijkseOpwekking);
   });
 
   it("should handle different panel powers", () => {
@@ -49,10 +47,7 @@ describe("berekenZonnepanelen", () => {
     const largeResult = berekenZonnepanelen(largePanelInput);
 
     expect(largeResult.aantalPanelen).toBeLessThan(smallResult.aantalPanelen);
-    expect(largeResult.benodigdVermogen).toBeCloseTo(
-      smallResult.benodigdVermogen,
-      1
-    );
+    expect(largeResult.benodigdVermogen).toBeCloseTo(smallResult.benodigdVermogen, 1);
   });
 
   it("should calculate savings based on electricity price", () => {
@@ -69,9 +64,7 @@ describe("berekenZonnepanelen", () => {
     const lowPriceResult = berekenZonnepanelen(lowPriceInput);
     const highPriceResult = berekenZonnepanelen(highPriceInput);
 
-    expect(highPriceResult.jaarlijkseBesparing).toBeGreaterThan(
-      lowPriceResult.jaarlijkseBesparing
-    );
+    expect(highPriceResult.jaarlijkseBesparing).toBeGreaterThan(lowPriceResult.jaarlijkseBesparing);
   });
 
   it("should handle edge cases", () => {
@@ -90,4 +83,3 @@ describe("berekenZonnepanelen", () => {
     expect(result.dekkingPercentage).toBeGreaterThanOrEqual(0);
   });
 });
-

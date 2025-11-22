@@ -33,19 +33,19 @@ export function berekenThuisbatterij(input: ThuisbatterijInput): ThuisbatterijRe
     stroomPrijs = 0.27,
     terugleverVergoeding = 0.08,
   } = input;
-  
+
   // Jaarlijkse opwekking (als niet opgegeven)
-  const opwekking = jaarlijkseOpwekking || (zonnepaneelVermogen * opbrengstPerkWp);
-  
+  const opwekking = jaarlijkseOpwekking || zonnepaneelVermogen * opbrengstPerkWp;
+
   // Zonder batterij: ~30-35% eigen verbruik
   const eigenVerbruikZonder = Math.min(jaarlijksVerbruik, opwekking * 0.35);
   const eigenVerbruikPercentageZonder = (eigenVerbruikZonder / opwekking) * 100;
-  
+
   // Capaciteit berekening
   let aanbevolenCapaciteit: number;
   let minimaleCapaciteit: number;
   let maximaleCapaciteit: number;
-  
+
   if (doel === "backup") {
     // Voor backup: gemiddeld verbruik per uur × gewenste uren
     const gemiddeldVerbruikPerUur = jaarlijksVerbruik / (365 * 24);
@@ -59,14 +59,14 @@ export function berekenThuisbatterij(input: ThuisbatterijInput): ThuisbatterijRe
     maximaleCapaciteit = zonnepaneelVermogen * 1.5;
     aanbevolenCapaciteit = zonnepaneelVermogen * 1.25;
   }
-  
+
   // Met batterij: eigen verbruik stijgt naar ~60-70%
-  const eigenVerbruikMet = Math.min(jaarlijksVerbruik, opwekking * 0.70);
+  const eigenVerbruikMet = Math.min(jaarlijksVerbruik, opwekking * 0.7);
   const eigenVerbruikPercentageMet = (eigenVerbruikMet / opwekking) * 100;
-  
+
   // Financiële besparing
   let jaarlijkseBesparing = 0;
-  
+
   if (!salderingActief) {
     // Extra zelfverbruik door batterij
     const extraZelfverbruik = eigenVerbruikMet - eigenVerbruikZonder;
@@ -78,15 +78,16 @@ export function berekenThuisbatterij(input: ThuisbatterijInput): ThuisbatterijRe
     const extraZelfverbruik = eigenVerbruikMet - eigenVerbruikZonder;
     jaarlijkseBesparing = extraZelfverbruik * terugleverkosten;
   }
-  
+
   // Advies tekst
   let advies = `Voor ${zonnepaneelVermogen} kWp zonnepanelen is een batterij van ${Math.round(aanbevolenCapaciteit * 10) / 10} kWh aanbevolen (range: ${Math.round(minimaleCapaciteit * 10) / 10} - ${Math.round(maximaleCapaciteit * 10) / 10} kWh).`;
   advies += ` Zelfconsumptie stijgt van ${Math.round(eigenVerbruikPercentageZonder * 10) / 10}% naar ${Math.round(eigenVerbruikPercentageMet * 10) / 10}%.`;
-  
+
   if (salderingActief) {
-    advies += " Momenteel met saldering is de financiële besparing beperkt. Na afbouw saldering wordt een batterij financieel interessanter.";
+    advies +=
+      " Momenteel met saldering is de financiële besparing beperkt. Na afbouw saldering wordt een batterij financieel interessanter.";
   }
-  
+
   return {
     aanbevolenCapaciteit: Math.round(aanbevolenCapaciteit * 10) / 10,
     minimaleCapaciteit: Math.round(minimaleCapaciteit * 10) / 10,
@@ -97,4 +98,3 @@ export function berekenThuisbatterij(input: ThuisbatterijInput): ThuisbatterijRe
     advies,
   };
 }
-

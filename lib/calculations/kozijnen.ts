@@ -27,37 +27,32 @@ const uWaarden: Record<string, number> = {
 const nieuweUWaarde = 1.1; // HR++
 
 export function berekenKozijnen(input: KozijnenInput): KozijnenResult {
-  const {
-    oppervlakteRamen,
-    huidigGlasType,
-    gasVerbruik: _gasVerbruik,
-    gasPrijs = 1.20,
-  } = input;
-  
+  const { oppervlakteRamen, huidigGlasType, gasVerbruik: _gasVerbruik, gasPrijs = 1.2 } = input;
+
   // Huidige en nieuwe U-waarde
   const huidigeUWaarde = uWaarden[huidigGlasType] || 2.8;
-  
+
   // Warmteverlies reductie
   const warmteverliesReductie = (huidigeUWaarde - nieuweUWaarde) * oppervlakteRamen;
-  
+
   // Gasbesparing (vereenvoudigde berekening)
   // Aanname: 1 W/K reductie ≈ 0.5 m³ gas/jaar besparing
   const gasBesparing = warmteverliesReductie * 0.5;
-  
+
   // Kostenbesparing
   const kostenBesparing = gasBesparing * gasPrijs;
-  
+
   // CO2 reductie
   const co2Reductie = gasBesparing * 1.8;
-  
+
   // Comfort verbetering
   let comfortVerbetering = "Nieuwe kozijnen met HR++ glas verbeteren het comfort door:";
   comfortVerbetering += " minder tocht, betere geluidsisolatie, en minder condensvorming.";
-  
+
   if (huidigGlasType === "enkel") {
     comfortVerbetering += " De verbetering is zeer significant ten opzichte van enkel glas.";
   }
-  
+
   return {
     huidigeUWaarde: Math.round(huidigeUWaarde * 10) / 10,
     nieuweUWaarde: Math.round(nieuweUWaarde * 10) / 10,
@@ -68,4 +63,3 @@ export function berekenKozijnen(input: KozijnenInput): KozijnenResult {
     comfortVerbetering,
   };
 }
-

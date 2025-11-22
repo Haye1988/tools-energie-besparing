@@ -32,11 +32,7 @@ export function isEmbedMode(): boolean {
 export function sendHeightToParent() {
   if (typeof window === "undefined") return;
   if (window.parent === window) return; // Not in iframe
-  
-  const height = document.documentElement.scrollHeight;
-  window.parent.postMessage(
-    { type: "resize", height },
-    "*"
-  );
-}
 
+  const height = document.documentElement.scrollHeight;
+  window.parent.postMessage({ type: "resize", height }, "*");
+}

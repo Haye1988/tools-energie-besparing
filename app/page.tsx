@@ -2,97 +2,97 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { 
-  Sun, 
-  Wind, 
-  Snowflake, 
-  Battery, 
-  Home as HomeIcon, 
-  Flame, 
-  Zap, 
-  FileText, 
-  Square as WindowIcon, 
-  Award, 
-  Droplet 
+import {
+  Sun,
+  Wind,
+  Snowflake,
+  Battery,
+  Home as HomeIcon,
+  Flame,
+  Zap,
+  FileText,
+  Square as WindowIcon,
+  Award,
+  Droplet,
 } from "lucide-react";
 
 const tools = [
-  { 
-    name: "Zonnepanelen", 
-    href: "/zonnepanelen", 
+  {
+    name: "Zonnepanelen",
+    href: "/zonnepanelen",
     description: "Bereken je zonnepanelen opbrengst en besparing",
     icon: Sun,
-    color: "text-yellow-500"
+    color: "text-yellow-500",
   },
-  { 
-    name: "Warmtepomp", 
-    href: "/warmtepomp", 
+  {
+    name: "Warmtepomp",
+    href: "/warmtepomp",
     description: "Ontdek hoeveel je bespaart met een warmtepomp",
     icon: Wind,
-    color: "text-blue-500"
+    color: "text-blue-500",
   },
-  { 
-    name: "Airconditioning", 
-    href: "/airco", 
+  {
+    name: "Airconditioning",
+    href: "/airco",
     description: "Bereken het benodigde koelvermogen",
     icon: Snowflake,
-    color: "text-cyan-500"
+    color: "text-cyan-500",
   },
-  { 
-    name: "Thuisbatterij", 
-    href: "/thuisbatterij", 
+  {
+    name: "Thuisbatterij",
+    href: "/thuisbatterij",
     description: "Optimaliseer je zelfconsumptie",
     icon: Battery,
-    color: "text-green-500"
+    color: "text-green-500",
   },
-  { 
-    name: "Isolatie", 
-    href: "/isolatie", 
+  {
+    name: "Isolatie",
+    href: "/isolatie",
     description: "Bereken isolatie besparingen",
     icon: HomeIcon,
-    color: "text-orange-500"
+    color: "text-orange-500",
   },
-  { 
-    name: "CV-Ketel", 
-    href: "/cv-ketel", 
+  {
+    name: "CV-Ketel",
+    href: "/cv-ketel",
     description: "Vervangingsadvies en besparing",
     icon: Flame,
-    color: "text-red-500"
+    color: "text-red-500",
   },
-  { 
-    name: "Laadpaal", 
-    href: "/laadpaal", 
+  {
+    name: "Laadpaal",
+    href: "/laadpaal",
     description: "Bereken laadpaal capaciteit en kosten",
     icon: Zap,
-    color: "text-purple-500"
+    color: "text-purple-500",
   },
-  { 
-    name: "Energiecontract", 
-    href: "/energiecontract", 
+  {
+    name: "Energiecontract",
+    href: "/energiecontract",
     description: "Vergelijk energiecontracten",
     icon: FileText,
-    color: "text-indigo-500"
+    color: "text-indigo-500",
   },
-  { 
-    name: "Kozijnen", 
-    href: "/kozijnen", 
+  {
+    name: "Kozijnen",
+    href: "/kozijnen",
     description: "Bereken besparing met nieuwe kozijnen",
     icon: WindowIcon,
-    color: "text-teal-500"
+    color: "text-teal-500",
   },
-  { 
-    name: "Energielabel", 
-    href: "/energielabel", 
+  {
+    name: "Energielabel",
+    href: "/energielabel",
     description: "Bereken je energielabel",
     icon: Award,
-    color: "text-pink-500"
+    color: "text-pink-500",
   },
-  { 
-    name: "Boilers", 
-    href: "/boilers", 
+  {
+    name: "Boilers",
+    href: "/boilers",
     description: "Boiler advies en dimensionering",
     icon: Droplet,
-    color: "text-blue-400"
+    color: "text-blue-400",
   },
 ];
 
@@ -123,7 +123,7 @@ export default function Home() {
             Bereken je persoonlijke energiebesparing met onze interactieve calculators
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
           {tools.map((tool, index) => {
             const Icon = tool.icon;
@@ -134,7 +134,9 @@ export default function Home() {
                 className="card-hover bg-white rounded-card border border-gray-100 p-6 lg:p-8 shadow-card group animate-slide-up"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className={`${tool.color} mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                <div
+                  className={`${tool.color} mb-4 group-hover:scale-110 transition-transform duration-300`}
+                >
                   <Icon className="w-10 h-10" />
                 </div>
                 <h2 className="text-xl font-bold text-totaaladvies-blue mb-2 group-hover:text-totaaladvies-orange transition-colors">
@@ -151,4 +153,3 @@ export default function Home() {
     </div>
   );
 }
-

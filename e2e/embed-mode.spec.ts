@@ -16,4 +16,3 @@ test.describe("Embed Mode", () => {
     await expect(page.getByLabel(/Jaarlijks stroomverbruik/i)).toBeVisible();
   });
 });
-

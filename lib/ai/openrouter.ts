@@ -60,21 +60,21 @@ export interface OpenRouterResponse {
   error?: string;
 }
 
-export async function getAIResponse(
-  request: OpenRouterRequest
-): Promise<OpenRouterResponse> {
+export async function getAIResponse(request: OpenRouterRequest): Promise<OpenRouterResponse> {
   const { tool, question, context } = request;
 
   const apiKey = process.env.OPENROUTER_API_KEY || undefined;
   if (!apiKey) {
     return {
-      answer: "AI-functie is momenteel niet beschikbaar. Voeg OPENROUTER_API_KEY toe aan environment variables.",
+      answer:
+        "AI-functie is momenteel niet beschikbaar. Voeg OPENROUTER_API_KEY toe aan environment variables.",
       error: "Missing API key",
     };
   }
 
-  const systemPrompt = toolPrompts[tool] || "Je bent een energieadviseur. Antwoord altijd in het Nederlands.";
-  
+  const systemPrompt =
+    toolPrompts[tool] || "Je bent een energieadviseur. Antwoord altijd in het Nederlands.";
+
   // Format context voor de prompt
   const contextText = Object.entries(context)
     .map(([key, value]) => `${key}: ${value}`)
@@ -112,7 +112,8 @@ export async function getAIResponse(
       const errorData = await response.text();
       console.error("OpenRouter API error:", errorData);
       return {
-        answer: "Sorry, er ging iets mis bij het ophalen van het AI-antwoord. Probeer het later opnieuw.",
+        answer:
+          "Sorry, er ging iets mis bij het ophalen van het AI-antwoord. Probeer het later opnieuw.",
         error: `API error: ${response.status}`,
       };
     }
@@ -129,4 +130,3 @@ export async function getAIResponse(
     };
   }
 }
-

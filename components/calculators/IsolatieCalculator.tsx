@@ -14,7 +14,7 @@ export default function IsolatieCalculator() {
     gasVerbruik: 1200,
     maatregelen: [],
     huidigGlasType: "dubbel",
-    gasPrijs: 1.20,
+    gasPrijs: 1.2,
   });
 
   const result = useMemo(() => {
@@ -45,10 +45,8 @@ export default function IsolatieCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         <div className="space-y-6">
           <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">
-              Jouw gegevens
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
+
             <div className="space-y-5">
               <SelectField
                 label="Woningtype"
@@ -63,7 +61,7 @@ export default function IsolatieCalculator() {
                   { value: "vrijstaand", label: "Vrijstaand" },
                 ]}
               />
-              
+
               <InputField
                 label="Jaarlijks gasverbruik"
                 name="gasVerbruik"
@@ -74,7 +72,7 @@ export default function IsolatieCalculator() {
                 step={100}
                 unit="m³/jaar"
               />
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Te isoleren onderdelen
@@ -89,13 +87,17 @@ export default function IsolatieCalculator() {
                         className="w-4 h-4"
                       />
                       <span className="text-sm text-gray-700 capitalize">
-                        {maatregel === "spouw" ? "Spouwmuur" : maatregel === "glas" ? "HR++ glas" : maatregel}
+                        {maatregel === "spouw"
+                          ? "Spouwmuur"
+                          : maatregel === "glas"
+                            ? "HR++ glas"
+                            : maatregel}
                       </span>
                     </label>
                   ))}
                 </div>
               </div>
-              
+
               {input.maatregelen.includes("glas") && (
                 <SelectField
                   label="Huidig glastype"
@@ -109,12 +111,12 @@ export default function IsolatieCalculator() {
                   ]}
                 />
               )}
-              
+
               <InputField
                 label="Gasprijs"
                 name="gasPrijs"
                 type="number"
-                value={input.gasPrijs ?? 1.20}
+                value={input.gasPrijs ?? 1.2}
                 onChange={(val) => setInput({ ...input, gasPrijs: Number(val) })}
                 min={0}
                 step={0.01}
@@ -123,7 +125,7 @@ export default function IsolatieCalculator() {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-6">
           {result && result.maatregelen.length > 0 && (
             <>
@@ -134,21 +136,21 @@ export default function IsolatieCalculator() {
                   unit="m³/jaar"
                   variant="success"
                 />
-                
+
                 <ResultCard
                   title="Totaal kostenbesparing"
                   value={result.totaalKostenBesparing}
                   unit="€/jaar"
                   variant="success"
                 />
-                
+
                 <ResultCard
                   title="CO₂ reductie"
                   value={result.totaalCo2Reductie}
                   unit="kg/jaar"
                   variant="info"
                 />
-                
+
                 <ResultCard
                   title="Nieuw gasverbruik"
                   value={result.nieuwGasVerbruik}
@@ -156,16 +158,18 @@ export default function IsolatieCalculator() {
                   variant="info"
                 />
               </div>
-              
+
               <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Per maatregel
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Per maatregel</h3>
                 <div className="space-y-3">
                   {result.maatregelen.map((m) => (
                     <div key={m.maatregel} className="border-b border-gray-200 pb-3 last:border-0">
                       <h4 className="font-medium text-gray-900 capitalize mb-1">
-                        {m.maatregel === "spouw" ? "Spouwmuur" : m.maatregel === "glas" ? "HR++ glas" : m.maatregel}
+                        {m.maatregel === "spouw"
+                          ? "Spouwmuur"
+                          : m.maatregel === "glas"
+                            ? "HR++ glas"
+                            : m.maatregel}
                       </h4>
                       <div className="text-sm text-gray-600 space-y-1">
                         <p>Gasbesparing: {m.gasBesparing} m³/jaar</p>
@@ -176,14 +180,11 @@ export default function IsolatieCalculator() {
                   ))}
                 </div>
               </div>
-              
-              <LeadForm
-                tool="isolatie"
-                results={result}
-              />
+
+              <LeadForm tool="isolatie" results={result} />
             </>
           )}
-          
+
           {result && result.maatregelen.length === 0 && (
             <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 lg:p-8">
               <p className="text-yellow-800">
@@ -196,4 +197,3 @@ export default function IsolatieCalculator() {
     </CalculatorLayout>
   );
 }
-

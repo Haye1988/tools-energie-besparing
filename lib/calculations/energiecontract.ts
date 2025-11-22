@@ -28,22 +28,22 @@ export function berekenEnergiecontract(input: EnergiecontractInput): Energiecont
     jaarverbruikStroom,
     jaarverbruikGas,
   } = input;
-  
+
   // Huidige kosten
   const stroomKostenHuidig = jaarverbruikStroom * huidigStroomPrijs;
   const gasKostenHuidig = jaarverbruikGas * huidigGasPrijs;
   const huidigeKosten = stroomKostenHuidig + gasKostenHuidig;
-  
+
   // Nieuwe kosten
   const stroomKostenNieuw = jaarverbruikStroom * nieuwStroomPrijs;
   const gasKostenNieuw = jaarverbruikGas * nieuwGasPrijs;
   const nieuweKosten = stroomKostenNieuw + gasKostenNieuw;
-  
+
   // Verschil
   const verschil = nieuweKosten - huidigeKosten; // Negatief = besparing
   const verschilPercentage = (verschil / huidigeKosten) * 100;
   const maandelijksVerschil = verschil / 12;
-  
+
   return {
     huidigeKosten: Math.round(huidigeKosten * 100) / 100,
     nieuweKosten: Math.round(nieuweKosten * 100) / 100,
@@ -56,4 +56,3 @@ export function berekenEnergiecontract(input: EnergiecontractInput): Energiecont
     gasKostenNieuw: Math.round(gasKostenNieuw * 100) / 100,
   };
 }
-

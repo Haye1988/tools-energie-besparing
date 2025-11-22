@@ -57,7 +57,9 @@ export default function LeadForm({ tool, results, onSuccess, className }: LeadFo
 
   if (submitStatus === "success") {
     return (
-      <div className={`bg-gradient-card-success border border-success-200 rounded-card p-6 shadow-card animate-scale-in ${className}`}>
+      <div
+        className={`bg-gradient-card-success border border-success-200 rounded-card p-6 shadow-card animate-scale-in ${className}`}
+      >
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0 w-10 h-10 bg-success-500 rounded-full flex items-center justify-center">
             <svg
@@ -91,30 +93,33 @@ export default function LeadForm({ tool, results, onSuccess, className }: LeadFo
         <h3 className="text-xl font-bold text-totaaladvies-blue mb-6">
           Ontvang een vrijblijvend advies
         </h3>
-        
+
         <div className="space-y-4">
           <InputField
             label="E-mailadres"
             name="email"
             type="email"
             value={email}
-            onChange={setEmail}
+            onChange={(val) => setEmail(String(val))}
             placeholder="jouw@email.nl"
             required
           />
-          
+
           <InputField
             label="Postcode"
             name="postcode"
             type="text"
             value={postcode}
-            onChange={setPostcode}
+            onChange={(val) => setPostcode(String(val))}
             placeholder="1234AB"
             required
           />
-          
+
           <div className="space-y-2">
-            <label htmlFor="additionalInfo" className="block text-sm font-medium text-totaaladvies-gray-medium">
+            <label
+              htmlFor="additionalInfo"
+              className="block text-sm font-medium text-totaaladvies-gray-medium"
+            >
               Aanvullende opmerkingen (optioneel)
             </label>
             <textarea
@@ -127,15 +132,13 @@ export default function LeadForm({ tool, results, onSuccess, className }: LeadFo
               className="input-focus w-full px-4 py-3.5 bg-white border border-gray-200 rounded-input text-totaaladvies-blue placeholder:text-gray-400 outline-none transition-all duration-200 hover:border-totaaladvies-gray-medium resize-none"
             />
           </div>
-          
+
           {submitStatus === "error" && (
             <div className="bg-red-50 border border-red-200 rounded-input p-4 animate-fade-in">
-              <p className="text-sm text-red-700">
-                Er ging iets mis. Probeer het opnieuw.
-              </p>
+              <p className="text-sm text-red-700">Er ging iets mis. Probeer het opnieuw.</p>
             </div>
           )}
-          
+
           <button
             type="submit"
             disabled={isSubmitting || !email || !postcode}
@@ -148,4 +151,3 @@ export default function LeadForm({ tool, results, onSuccess, className }: LeadFo
     </form>
   );
 }
-

@@ -82,10 +82,11 @@ npm start
 Elke tool kan worden geëmbed via iframe:
 
 ```html
-<iframe 
-  src="https://tools.totaaladvies.nl/zonnepanelen?embed=true" 
-  style="width:100%; min-height:600px; border:none;" 
-  title="Zonnepanelen besparingstool">
+<iframe
+  src="https://tools.totaaladvies.nl/zonnepanelen?embed=true"
+  style="width:100%; min-height:600px; border:none;"
+  title="Zonnepanelen besparingstool"
+>
 </iframe>
 ```
 
@@ -149,4 +150,3 @@ Zie [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) voor development guidelines e
 ## Licentie
 
 Privé project voor Totaaladvies.nl
-

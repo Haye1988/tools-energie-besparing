@@ -41,10 +41,8 @@ export default function EnergielabelCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         <div className="space-y-6">
           <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">
-              Jouw gegevens
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
+
             <div className="space-y-5">
               <InputField
                 label="Bouwjaar"
@@ -56,7 +54,7 @@ export default function EnergielabelCalculator() {
                 max={2025}
                 step={1}
               />
-              
+
               <SelectField
                 label="Woningtype"
                 name="woningType"
@@ -70,7 +68,7 @@ export default function EnergielabelCalculator() {
                   { value: "vrijstaand", label: "Vrijstaand" },
                 ]}
               />
-              
+
               <InputField
                 label="Oppervlakte"
                 name="oppervlakte"
@@ -81,7 +79,7 @@ export default function EnergielabelCalculator() {
                 step={10}
                 unit="m²"
               />
-              
+
               <SelectField
                 label="Isolatie dak"
                 name="isolatieDak"
@@ -93,7 +91,7 @@ export default function EnergielabelCalculator() {
                   { value: "goed", label: "Goed" },
                 ]}
               />
-              
+
               <SelectField
                 label="Isolatie muren"
                 name="isolatieMuren"
@@ -105,7 +103,7 @@ export default function EnergielabelCalculator() {
                   { value: "goed", label: "Goed" },
                 ]}
               />
-              
+
               <SelectField
                 label="Isolatie vloer"
                 name="isolatieVloer"
@@ -117,7 +115,7 @@ export default function EnergielabelCalculator() {
                   { value: "goed", label: "Goed" },
                 ]}
               />
-              
+
               <SelectField
                 label="Glastype"
                 name="glasType"
@@ -129,7 +127,7 @@ export default function EnergielabelCalculator() {
                   { value: "hr", label: "HR glas" },
                 ]}
               />
-              
+
               <SelectField
                 label="Verwarmingssysteem"
                 name="verwarmingssysteem"
@@ -141,7 +139,7 @@ export default function EnergielabelCalculator() {
                   { value: "hybride", label: "Hybride" },
                 ]}
               />
-              
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -154,7 +152,7 @@ export default function EnergielabelCalculator() {
                   Ik heb zonnepanelen
                 </label>
               </div>
-              
+
               {input.zonnepanelen && (
                 <InputField
                   label="Zonnepaneel vermogen"
@@ -170,23 +168,15 @@ export default function EnergielabelCalculator() {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-6">
           {result && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ResultCard
-                  title="Huidig label"
-                  value={result.huidigLabel}
-                  variant="info"
-                />
-                
-                <ResultCard
-                  title="EPG waarde"
-                  value={result.epgWaarde}
-                  variant="info"
-                />
-                
+                <ResultCard title="Huidig label" value={result.huidigLabel} variant="info" />
+
+                <ResultCard title="EPG waarde" value={result.epgWaarde} variant="info" />
+
                 <ResultCard
                   title="Potentiële besparing"
                   value={result.potentieleBesparing}
@@ -194,11 +184,9 @@ export default function EnergielabelCalculator() {
                   variant="success"
                 />
               </div>
-              
+
               <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Verbeteradvies
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Verbeteradvies</h3>
                 <ul className="space-y-2">
                   {result.verbeterAdvies.map((advies, idx) => (
                     <li key={idx} className="text-gray-700 flex items-start gap-2">
@@ -208,11 +196,8 @@ export default function EnergielabelCalculator() {
                   ))}
                 </ul>
               </div>
-              
-              <LeadForm
-                tool="energielabel"
-                results={result}
-              />
+
+              <LeadForm tool="energielabel" results={result} />
             </>
           )}
         </div>
@@ -220,4 +205,3 @@ export default function EnergielabelCalculator() {
     </CalculatorLayout>
   );
 }
-
