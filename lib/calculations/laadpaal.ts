@@ -18,7 +18,7 @@ export interface LaadpaalResult {
 }
 
 // Standaard laadvermogens
-const laadvermogens = {
+const _laadvermogens = {
   "1-fase": {
     "16A": 3.7, // kW
     "32A": 7.4, // kW

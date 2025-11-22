@@ -30,7 +30,7 @@ export function berekenKozijnen(input: KozijnenInput): KozijnenResult {
   const {
     oppervlakteRamen,
     huidigGlasType,
-    gasVerbruik,
+    gasVerbruik: _gasVerbruik,
     gasPrijs = 1.20,
   } = input;
   
