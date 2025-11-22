@@ -75,6 +75,7 @@ const config: Config = {
         "slide-up": "slideUp 0.3s ease-out",
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "scale-in": "scaleIn 0.2s ease-out",
+        "pulse-glow": "pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       keyframes: {
         fadeIn: {
@@ -88,6 +89,10 @@ const config: Config = {
         scaleIn: {
           "0%": { transform: "scale(0.95)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        pulseGlow: {
+          "0%, 100%": { boxShadow: "0 0 0 0 rgba(255, 122, 0, 0.7)" },
+          "50%": { boxShadow: "0 0 0 10px rgba(255, 122, 0, 0)" },
         },
       },
       maxWidth: {
