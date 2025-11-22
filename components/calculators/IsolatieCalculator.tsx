@@ -100,7 +100,7 @@ export default function IsolatieCalculator() {
                 <SelectField
                   label="Huidig glastype"
                   name="huidigGlasType"
-                  value={input.huidigGlasType}
+                  value={input.huidigGlasType ?? "dubbel"}
                   onChange={(val) => setInput({ ...input, huidigGlasType: val as any })}
                   options={[
                     { value: "enkel", label: "Enkel glas" },
