@@ -56,7 +56,7 @@ export default function BoilersCalculator() {
               <SelectField
                 label="Warmwater behoefte"
                 name="warmwaterBehoefte"
-                value={input.warmwaterBehoefte}
+                value={input.warmwaterBehoefte ?? "gemiddeld"}
                 onChange={(val) => setInput({ ...input, warmwaterBehoefte: val as any })}
                 options={[
                   { value: "laag", label: "Laag" },
@@ -81,7 +81,7 @@ export default function BoilersCalculator() {
                 label="Stroomprijs"
                 name="stroomPrijs"
                 type="number"
-                value={input.stroomPrijs}
+                value={input.stroomPrijs ?? 0.27}
                 onChange={(val) => setInput({ ...input, stroomPrijs: Number(val) })}
                 min={0}
                 step={0.01}
@@ -92,7 +92,7 @@ export default function BoilersCalculator() {
                 label="Gasprijs"
                 name="gasPrijs"
                 type="number"
-                value={input.gasPrijs}
+                value={input.gasPrijs ?? 1.20}
                 onChange={(val) => setInput({ ...input, gasPrijs: Number(val) })}
                 min={0}
                 step={0.01}
