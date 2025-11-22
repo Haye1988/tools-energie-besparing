@@ -92,7 +92,7 @@ export default function CvKetelCalculator() {
                 label="Gasprijs"
                 name="gasPrijs"
                 type="number"
-                value={input.gasPrijs}
+                value={input.gasPrijs ?? 1.20}
                 onChange={(val) => setInput({ ...input, gasPrijs: Number(val) })}
                 min={0}
                 step={0.01}

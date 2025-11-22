@@ -107,7 +107,7 @@ export default function ThuisbatterijCalculator() {
                 label="Stroomprijs"
                 name="stroomPrijs"
                 type="number"
-                value={input.stroomPrijs}
+                value={input.stroomPrijs ?? 0.27}
                 onChange={(val) => setInput({ ...input, stroomPrijs: Number(val) })}
                 min={0}
                 step={0.01}
