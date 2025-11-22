@@ -160,7 +160,7 @@ export default function EnergielabelCalculator() {
                   label="Zonnepaneel vermogen"
                   name="zonnepaneelVermogen"
                   type="number"
-                  value={input.zonnepaneelVermogen}
+                  value={input.zonnepaneelVermogen ?? 0}
                   onChange={(val) => setInput({ ...input, zonnepaneelVermogen: Number(val) })}
                   min={0}
                   step={0.5}
