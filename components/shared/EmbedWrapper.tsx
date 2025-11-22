@@ -30,6 +30,8 @@ export default function EmbedWrapper({ children }: EmbedWrapperProps) {
         window.removeEventListener("resize", sendHeightToParent);
       };
     }
+    // Return undefined if not in embed mode
+    return undefined;
   }, [embed]);
 
   return (
@@ -38,4 +40,3 @@ export default function EmbedWrapper({ children }: EmbedWrapperProps) {
     </div>
   );
 }
-
