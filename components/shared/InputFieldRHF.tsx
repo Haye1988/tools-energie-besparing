@@ -65,7 +65,7 @@ export default function InputFieldRHF({
           aria-invalid={error ? "true" : "false"}
           aria-required={required}
           className={cn(
-            "input-focus w-full px-4 py-3.5 bg-white border rounded-input text-totaaladvies-blue placeholder:text-gray-400 outline-none transition-all duration-200",
+            "input-focus w-full px-3 py-2.5 md:py-3 bg-white border rounded-input text-totaaladvies-blue placeholder:text-gray-400 outline-none transition-all duration-200",
             error
               ? "border-red-500 focus:border-red-600 focus:ring-red-500"
               : "border-gray-200 hover:border-totaaladvies-gray-medium"
@@ -73,7 +73,7 @@ export default function InputFieldRHF({
         />
         {unit && (
           <span
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-totaaladvies-gray-medium text-sm pointer-events-none"
+            className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 text-totaaladvies-gray-medium text-sm pointer-events-none"
             aria-hidden="true"
           >
             {unit}

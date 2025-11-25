@@ -40,7 +40,11 @@ export default function InputField({
     <div className={cn("space-y-2", className)}>
       <label htmlFor={name} className="block text-sm font-medium text-totaaladvies-gray-medium">
         {label}
-        {required && <span className="text-totaaladvies-red ml-1" aria-label="verplicht veld">*</span>}
+        {required && (
+          <span className="text-totaaladvies-red ml-1" aria-label="verplicht veld">
+            *
+          </span>
+        )}
       </label>
       <div className="relative">
         <input
@@ -59,10 +63,13 @@ export default function InputField({
           required={required}
           aria-describedby={ariaDescribedBy}
           aria-required={required}
-          className="input-focus w-full px-4 py-3.5 bg-white border border-gray-200 rounded-input text-totaaladvies-blue placeholder:text-gray-400 outline-none transition-all duration-200 hover:border-totaaladvies-gray-medium"
+          className="input-focus w-full px-3 py-2.5 md:py-3 bg-white border border-gray-200 rounded-input text-totaaladvies-blue placeholder:text-gray-400 outline-none transition-all duration-200 hover:border-totaaladvies-gray-medium"
         />
         {unit && (
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-totaaladvies-gray-medium text-sm pointer-events-none" aria-hidden="true">
+          <span
+            className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 text-totaaladvies-gray-medium text-sm pointer-events-none"
+            aria-hidden="true"
+          >
             {unit}
           </span>
         )}

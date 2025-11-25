@@ -45,13 +45,10 @@ export default function SelectField({
             onChange(val);
           }}
           required={required}
-          className="input-focus w-full px-4 py-3.5 bg-white border border-gray-200 rounded-input text-totaaladvies-blue outline-none transition-all duration-200 hover:border-totaaladvies-gray-medium appearance-none cursor-pointer"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FF7A00' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "right 1rem center",
-            paddingRight: "2.5rem",
-          }}
+          className={cn(
+            "input-focus w-full px-3 py-2.5 md:py-3 bg-white border border-gray-200 rounded-input text-totaaladvies-blue outline-none transition-all duration-200 hover:border-totaaladvies-gray-medium appearance-none cursor-pointer",
+            'bg-[url(\'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"%3E%3Cpath fill="%23FF7A00" d="M6 9L1 4h10z"/%3E%3C/svg%3E\')] bg-no-repeat bg-[right_0.75rem_center] md:bg-[right_1rem_center] pr-10'
+          )}
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>

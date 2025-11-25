@@ -139,7 +139,7 @@ export default function LeadForm({ tool, results, onSuccess, className }: LeadFo
               onChange={(e) => setAdditionalInfo(e.target.value)}
               placeholder="Vertel ons meer over je situatie..."
               rows={3}
-              className="input-focus w-full px-4 py-3.5 bg-white border border-gray-200 rounded-input text-totaaladvies-blue placeholder:text-gray-400 outline-none transition-all duration-200 hover:border-totaaladvies-gray-medium resize-none"
+              className="input-focus w-full px-3 py-2.5 md:py-3 bg-white border border-gray-200 rounded-input text-totaaladvies-blue placeholder:text-gray-400 outline-none transition-all duration-200 hover:border-totaaladvies-gray-medium resize-none"
             />
           </div>
 
