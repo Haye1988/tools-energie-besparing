@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
+import { StrictMode } from "react";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import "./globals.css";
 import "../sentry.client.config";
 
@@ -16,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="nl">
       <body>
-        {children}
+        <ErrorBoundary>
+          {process.env.NODE_ENV === "development" ? <StrictMode>{children}</StrictMode> : children}
+        </ErrorBoundary>
         <Analytics />
       </body>
     </html>

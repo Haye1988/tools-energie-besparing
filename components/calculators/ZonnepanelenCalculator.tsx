@@ -175,6 +175,21 @@ export default function ZonnepanelenCalculator() {
                   label="Terugleververgoeding"
                   name="terugleverVergoeding"
                   type="number"
+                  value={input.terugleverVergoeding ?? 0.08}
+                  onChange={(val) => setInput({ ...input, terugleverVergoeding: Number(val) })}
+                  min={0}
+                  max={0.5}
+                  step={0.01}
+                  unit="€/kWh"
+                  helpText="Vergoeding voor teruggeleverde stroom (standaard €0.08/kWh)"
+                />
+              )}
+
+              {!input.salderingActief && (
+                <InputField
+                  label="Terugleververgoeding"
+                  name="terugleverVergoeding"
+                  type="number"
                   value={input.terugleverVergoeding || 0.08}
                   onChange={(val) => setInput({ ...input, terugleverVergoeding: Number(val) })}
                   min={0}
@@ -318,12 +333,18 @@ export default function ZonnepanelenCalculator() {
                       </p>
                     </div>
                   )}
-                  {result.zelfconsumptieMetBatterij && (
-                    <p className="mt-2">
-                      <strong>Zelfconsumptie met batterij:</strong>{" "}
-                      {result.zelfconsumptieMetBatterij}%
+                  <div className="mt-4 p-3 bg-gray-50 rounded border border-gray-200">
+                    <p className="text-sm text-gray-700 mb-1">
+                      <strong>Zelfconsumptie zonder batterij:</strong>{" "}
+                      {result.zelfconsumptieZonderBatterij}% van opwekking
                     </p>
-                  )}
+                    {result.zelfconsumptieMetBatterij && (
+                      <p className="text-sm text-gray-700">
+                        <strong>Zelfconsumptie met batterij:</strong>{" "}
+                        {result.zelfconsumptieMetBatterij}% van opwekking
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 

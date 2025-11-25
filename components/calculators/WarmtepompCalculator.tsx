@@ -125,6 +125,21 @@ export default function WarmtepompCalculator() {
               />
 
               <InputField
+                label="Extra isolatiecorrectie (optioneel)"
+                name="isolatieCorrectie"
+                type="number"
+                value={input.isolatieCorrectie || ""}
+                onChange={(val) =>
+                  setInput({ ...input, isolatieCorrectie: val ? Number(val) : undefined })
+                }
+                min={0}
+                max={50}
+                step={5}
+                unit="%"
+                helpText="Extra isolatieverbetering in % (0-50%). Verlaagt benodigd vermogen."
+              />
+
+              <InputField
                 label="Installatiekosten (optioneel)"
                 name="installatieKosten"
                 type="number"
@@ -136,6 +151,20 @@ export default function WarmtepompCalculator() {
                 step={1000}
                 unit="€"
                 helpText="Voor berekening terugverdientijd"
+              />
+
+              <InputField
+                label="Subsidiebedrag (optioneel)"
+                name="subsidieBedrag"
+                type="number"
+                value={input.subsidieBedrag || ""}
+                onChange={(val) =>
+                  setInput({ ...input, subsidieBedrag: val ? Number(val) : undefined })
+                }
+                min={0}
+                step={100}
+                unit="€"
+                helpText="Subsidiebedrag voor warmtepomp installatie"
               />
             </div>
           </div>

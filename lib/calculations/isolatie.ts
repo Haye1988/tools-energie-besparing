@@ -14,6 +14,7 @@ export interface IsolatieInput {
     vloer?: number;
     glas?: number;
   };
+  subsidieBedrag?: number; // € (optioneel, totaal subsidie voor alle maatregelen)
 }
 
 export interface IsolatieMaatregelResult {
@@ -42,6 +43,8 @@ export interface IsolatieResult {
   nieuwGasVerbruik: number; // m³/jaar
   prioriteitAdvies?: PrioriteitAdvies[]; // gesorteerd op impact
   totaalInvesteringsKosten?: number; // €
+  totaalNettoInvesteringsKosten?: number; // € (na subsidie)
+  subsidieBedrag?: number; // €
 }
 
 // Gasbesparing per maatregel per woningtype (m³/jaar)
@@ -136,6 +139,7 @@ export function berekenIsolatie(input: IsolatieInput): IsolatieResult {
     huidigeIsolatieVloer,
     bouwjaar,
     investeringsKosten,
+    subsidieBedrag = 0,
   } = input;
 
   // Bepaal huidige isolatiestatus
@@ -148,6 +152,7 @@ export function berekenIsolatie(input: IsolatieInput): IsolatieResult {
   const prioriteitLijst: PrioriteitAdvies[] = [];
   let totaalGasBesparing = 0;
   let totaalInvesteringsKosten = 0;
+  let totaalNettoInvesteringsKosten = 0;
 
   for (const maatregel of maatregelen) {
     let gasBesparing = 0;
@@ -183,8 +188,11 @@ export function berekenIsolatie(input: IsolatieInput): IsolatieResult {
         investeringsKosten?.[maatregel as keyof typeof investeringsKosten] ||
         (kostenDefault ? (kostenDefault.min + kostenDefault.max) / 2 : 0);
 
-      // Terugverdientijd
-      const terugverdientijd = kostenBesparing > 0 ? investering / kostenBesparing : undefined;
+      // Netto investering (na subsidie)
+      const nettoInvestering = Math.max(0, investering - subsidieBedrag / maatregelen.length);
+
+      // Terugverdientijd (op basis van netto investering)
+      const terugverdientijd = kostenBesparing > 0 ? nettoInvestering / kostenBesparing : undefined;
 
       resultaten.push({
         maatregel,
@@ -192,22 +200,27 @@ export function berekenIsolatie(input: IsolatieInput): IsolatieResult {
         kostenBesparing: Math.round(kostenBesparing * 100) / 100,
         co2Reductie: Math.round(co2Reductie),
         investeringsKosten: investering > 0 ? Math.round(investering) : undefined,
-        terugverdientijd: terugverdientijd ? Math.round(terugverdientijd * 10) / 10 : undefined,
+        terugverdientijd:
+          terugverdientijd && terugverdientijd > 0
+            ? Math.round(terugverdientijd * 10) / 10
+            : undefined,
       });
 
       // Voor prioritering: impact score = gasbesparing / investering (hoe hoger, hoe beter)
-      const impactScore = investering > 0 ? gasBesparing / investering : gasBesparing;
+      const impactScore = nettoInvestering > 0 ? gasBesparing / nettoInvestering : gasBesparing;
       prioriteitLijst.push({
         maatregel,
         gasBesparing: Math.round(gasBesparing),
         kostenBesparing: Math.round(kostenBesparing * 100) / 100,
-        investeringsKosten: Math.round(investering),
-        terugverdientijd: terugverdientijd ? Math.round(terugverdientijd * 10) / 10 : 0,
+        investeringsKosten: Math.round(nettoInvestering),
+        terugverdientijd:
+          terugverdientijd && terugverdientijd > 0 ? Math.round(terugverdientijd * 10) / 10 : 0,
         impactScore,
       });
 
       totaalGasBesparing += gasBesparing;
       totaalInvesteringsKosten += investering;
+      totaalNettoInvesteringsKosten += nettoInvestering;
     }
   }
 
@@ -235,5 +248,8 @@ export function berekenIsolatie(input: IsolatieInput): IsolatieResult {
     prioriteitAdvies: prioriteitLijst.length > 0 ? prioriteitLijst : undefined,
     totaalInvesteringsKosten:
       totaalInvesteringsKosten > 0 ? Math.round(totaalInvesteringsKosten) : undefined,
+    totaalNettoInvesteringsKosten:
+      totaalNettoInvesteringsKosten > 0 ? Math.round(totaalNettoInvesteringsKosten) : undefined,
+    subsidieBedrag: subsidieBedrag > 0 ? subsidieBedrag : undefined,
   };
 }

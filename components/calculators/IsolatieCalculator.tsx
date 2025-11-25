@@ -209,6 +209,22 @@ export default function IsolatieCalculator() {
                   </div>
                 </div>
               )}
+
+              {input.maatregelen.length > 0 && (
+                <InputField
+                  label="Subsidiebedrag (optioneel)"
+                  name="subsidieBedrag"
+                  type="number"
+                  value={input.subsidieBedrag || ""}
+                  onChange={(val) =>
+                    setInput({ ...input, subsidieBedrag: val ? Number(val) : undefined })
+                  }
+                  min={0}
+                  step={100}
+                  unit="€"
+                  helpText="Totaal subsidiebedrag voor alle maatregelen samen"
+                />
+              )}
             </div>
           </div>
         </div>
@@ -248,12 +264,23 @@ export default function IsolatieCalculator() {
 
               {result.totaalInvesteringsKosten && (
                 <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Totaal investeringskosten
-                  </h3>
-                  <p className="text-2xl font-bold text-totaaladvies-blue">
-                    €{result.totaalInvesteringsKosten.toLocaleString("nl-NL")}
-                  </p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Investeringskosten</h3>
+                  <div className="space-y-2">
+                    <p className="text-2xl font-bold text-totaaladvies-blue">
+                      €{result.totaalInvesteringsKosten.toLocaleString("nl-NL")}
+                    </p>
+                    {result.subsidieBedrag && result.subsidieBedrag > 0 && (
+                      <div className="text-sm text-gray-600">
+                        <p>Subsidie: -€{result.subsidieBedrag.toLocaleString("nl-NL")}</p>
+                        {result.totaalNettoInvesteringsKosten && (
+                          <p className="font-semibold text-green-600 mt-1">
+                            Netto investering: €
+                            {result.totaalNettoInvesteringsKosten.toLocaleString("nl-NL")}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 

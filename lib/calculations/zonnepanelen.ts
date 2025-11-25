@@ -21,7 +21,8 @@ export interface ZonnepanelenResult {
   dekkingPercentage: number; // % van verbruik
   besparingMetSaldering?: number; // €/jaar
   besparingZonderSaldering?: number; // €/jaar
-  zelfconsumptieMetBatterij?: number; // % (als batterij geselecteerd)
+  zelfconsumptieZonderBatterij?: number; // % (zonder batterij, ~30%)
+  zelfconsumptieMetBatterij?: number; // % (als batterij geselecteerd, ~65-70%)
 }
 
 // Opbrengstfactor per oriëntatie (kWh per Wp per jaar) - verfijnd
@@ -117,7 +118,8 @@ export function berekenZonnepanelen(input: ZonnepanelenInput): ZonnepanelenResul
   // Dekking percentage
   const dekkingPercentage = (jaarlijkseOpwekking / jaarlijksVerbruik) * 100;
 
-  // Zelfconsumptie percentage met batterij
+  // Zelfconsumptie percentages
+  const zelfconsumptiePercentageZonder = (zelfconsumptieZonder / jaarlijkseOpwekking) * 100;
   const zelfconsumptiePercentageMetBatterij = thuisbatterij
     ? (zelfconsumptieMetBatterij / jaarlijkseOpwekking) * 100
     : undefined;
@@ -131,6 +133,7 @@ export function berekenZonnepanelen(input: ZonnepanelenInput): ZonnepanelenResul
     dekkingPercentage: Math.round(dekkingPercentage * 10) / 10,
     besparingMetSaldering: Math.round(besparingMetSaldering * 100) / 100,
     besparingZonderSaldering: Math.round(besparingZonderSaldering * 100) / 100,
+    zelfconsumptieZonderBatterij: Math.round(zelfconsumptiePercentageZonder * 10) / 10,
     zelfconsumptieMetBatterij: zelfconsumptiePercentageMetBatterij
       ? Math.round(zelfconsumptiePercentageMetBatterij * 10) / 10
       : undefined,

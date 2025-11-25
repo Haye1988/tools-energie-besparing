@@ -7,6 +7,8 @@ export interface WarmtepompInput {
   stroomPrijs: number; // €/kWh
   cop?: number; // Coefficient of Performance (default 4, range 3-5)
   installatieKosten?: number; // € (optioneel, voor terugverdientijd)
+  isolatieCorrectie?: number; // Extra isolatiecorrectie in % (0-50)
+  subsidieBedrag?: number; // € (optioneel, voor terugverdientijd)
 }
 
 export interface ScenarioRange {
@@ -57,17 +59,22 @@ export function berekenWarmtepomp(input: WarmtepompInput): WarmtepompResult {
     stroomPrijs,
     cop = 4,
     installatieKosten,
+    isolatieCorrectie = 0,
+    subsidieBedrag = 0,
   } = input;
 
   // Correctiefactoren toepassen
   const woningFactor = woningTypeFactoren[woningType] || 1.0;
   const isolatieFactor = isolatieFactoren[isolatieNiveau] || 1.0;
 
+  // Extra isolatiecorrectie toepassen (0-50% reductie)
+  const extraIsolatieCorrectie = 1 - Math.min(50, Math.max(0, isolatieCorrectie)) / 100;
+
   // Benodigd vermogen (kW) = (gasverbruik × 8 kWh/m³) / 1650 uur
   // 1650 = vollasturen per jaar in NL
   // Correctiefactoren worden toegepast op het basisvermogen
   const basisVermogen = (gasVerbruik * 8) / 1650;
-  const benodigdVermogen = basisVermogen * woningFactor * isolatieFactor;
+  const benodigdVermogen = basisVermogen * woningFactor * isolatieFactor * extraIsolatieCorrectie;
 
   // Bij hybride: warmtepomp levert 40-50% van warmte (gebruik 45% als gemiddelde)
   // Bij all-electric: warmtepomp levert 100%
@@ -75,7 +82,8 @@ export function berekenWarmtepomp(input: WarmtepompInput): WarmtepompResult {
 
   // Warmtebehoefte in kWh (1 m³ gas ≈ 8 kWh voor verwarming)
   const warmteBehoefte_kWh = gasVerbruik * 8;
-  const gecorrigeerdeWarmteBehoefte = warmteBehoefte_kWh * woningFactor * isolatieFactor;
+  const gecorrigeerdeWarmteBehoefte =
+    warmteBehoefte_kWh * woningFactor * isolatieFactor * extraIsolatieCorrectie;
 
   // Warmte geleverd door warmtepomp
   const warmtepompWarmte_kWh = gecorrigeerdeWarmteBehoefte * warmtepompDekking;
@@ -97,29 +105,59 @@ export function berekenWarmtepomp(input: WarmtepompInput): WarmtepompResult {
   // CO2 reductie (1 m³ gas ≈ 1.8 kg CO2)
   const co2Reductie = gasBesparing * 1.8;
 
-  // Terugverdientijd (indien installatiekosten bekend)
+  // Terugverdientijd (indien installatiekosten bekend, na subsidie)
   let terugverdientijd: number | undefined;
-  if (installatieKosten && installatieKosten > 0 && nettoBesparing > 0) {
-    terugverdientijd = installatieKosten / nettoBesparing;
+  const nettoInvestering = Math.max(0, (installatieKosten || 0) - subsidieBedrag);
+  if (nettoInvestering > 0 && nettoBesparing > 0) {
+    terugverdientijd = nettoInvestering / nettoBesparing;
   }
 
-  // Scenario range: optimistisch (COP 5, goede isolatie), normaal (COP 4), pessimistisch (COP 3, slechte isolatie)
-  const copOptimistisch = 5;
-  const copPessimistisch = 3;
-  const isolatieFactorOptimistisch = isolatieNiveau === "goed" ? 0.9 : 1.0;
-  const isolatieFactorPessimistisch = isolatieNiveau === "slecht" ? 1.1 : 1.0;
+  // Scenario range: variëren op basis van COP, isolatie en stroomprijs
+  // Optimistisch: betere isolatie, hogere COP, lagere stroomprijs
+  // Pessimistisch: slechtere isolatie, lagere COP, hogere stroomprijs
 
+  const copOptimistisch = Math.min(5, cop + 0.5); // +0.5 COP (max 5)
+  const copPessimistisch = Math.max(3, cop - 0.5); // -0.5 COP (min 3)
+
+  // Isolatie variaties: optimistisch = 1 niveau beter, pessimistisch = 1 niveau slechter
+  const isolatieFactorOptimistisch =
+    isolatieNiveau === "goed"
+      ? 0.85 // Nog beter dan goed
+      : isolatieNiveau === "matig"
+        ? 0.9 // Goed niveau
+        : 1.0; // Blijft slecht
+
+  const isolatieFactorPessimistisch =
+    isolatieNiveau === "slecht"
+      ? 1.15 // Nog slechter
+      : isolatieNiveau === "matig"
+        ? 1.1 // Slecht niveau
+        : 0.95; // Blijft goed
+
+  // Stroomprijs variaties: ±10%
+  const stroomPrijsOptimistisch = stroomPrijs * 0.9; // 10% lager
+  const stroomPrijsPessimistisch = stroomPrijs * 1.1; // 10% hoger
+
+  // Vermogen variaties
   const vermogenOptimistisch = basisVermogen * woningFactor * isolatieFactorOptimistisch;
   const vermogenPessimistisch = basisVermogen * woningFactor * isolatieFactorPessimistisch;
 
-  const warmteOptimistisch = gecorrigeerdeWarmteBehoefte * warmtepompDekking;
-  const warmtePessimistisch = gecorrigeerdeWarmteBehoefte * warmtepompDekking;
+  // Warmtebehoefte variaties (met extra isolatiecorrectie)
+  const warmteBehoefteOptimistisch =
+    warmteBehoefte_kWh * woningFactor * isolatieFactorOptimistisch * extraIsolatieCorrectie;
+  const warmteBehoeftePessimistisch =
+    warmteBehoefte_kWh * woningFactor * isolatieFactorPessimistisch * extraIsolatieCorrectie;
+
+  const warmteOptimistisch = warmteBehoefteOptimistisch * warmtepompDekking;
+  const warmtePessimistisch = warmteBehoeftePessimistisch * warmtepompDekking;
 
   const stroomOptimistisch = warmteOptimistisch / copOptimistisch;
   const stroomPessimistisch = warmtePessimistisch / copPessimistisch;
 
-  const kostenOptimistisch = stroomOptimistisch * stroomPrijs + restGasVerbruik * gasPrijs;
-  const kostenPessimistisch = stroomPessimistisch * stroomPrijs + restGasVerbruik * gasPrijs;
+  const kostenOptimistisch =
+    stroomOptimistisch * stroomPrijsOptimistisch + restGasVerbruik * gasPrijs;
+  const kostenPessimistisch =
+    stroomPessimistisch * stroomPrijsPessimistisch + restGasVerbruik * gasPrijs;
 
   const besparingOptimistisch = huidigeKosten - kostenOptimistisch;
   const besparingPessimistisch = huidigeKosten - kostenPessimistisch;
