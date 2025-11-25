@@ -1,32 +1,57 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { berekenWarmtepomp, WarmtepompInput } from "@/lib/calculations/warmtepomp";
+import { warmtepompSchema, WarmtepompFormData } from "@/lib/validations/warmtepomp.schema";
 import CalculatorLayout from "@/components/shared/CalculatorLayout";
-import InputField from "@/components/shared/InputField";
-import SelectField from "@/components/shared/SelectField";
+import InputFieldRHF from "@/components/shared/InputFieldRHF";
+import SelectFieldRHF from "@/components/shared/SelectFieldRHF";
 import ResultCard from "@/components/shared/ResultCard";
 import LeadForm from "@/components/shared/LeadForm";
 
 export default function WarmtepompCalculator() {
-  const [input, setInput] = useState<WarmtepompInput>({
-    gasVerbruik: 1200,
-    woningType: "tussenwoning",
-    isolatieNiveau: "matig",
-    warmtepompType: "hybride",
-    gasPrijs: 1.2,
-    stroomPrijs: 0.27,
-    cop: 4,
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm<WarmtepompFormData>({
+    resolver: zodResolver(warmtepompSchema),
+    defaultValues: {
+      gasVerbruik: 1200,
+      woningType: "tussenwoning",
+      isolatieNiveau: "matig",
+      warmtepompType: "hybride",
+      gasPrijs: 1.2,
+      stroomPrijs: 0.27,
+      cop: 4,
+    },
+    mode: "onChange",
   });
+
+  const formValues = watch();
 
   const result = useMemo(() => {
     try {
+      const input: WarmtepompInput = {
+        gasVerbruik: formValues.gasVerbruik,
+        woningType: formValues.woningType,
+        isolatieNiveau: formValues.isolatieNiveau,
+        warmtepompType: formValues.warmtepompType,
+        gasPrijs: formValues.gasPrijs,
+        stroomPrijs: formValues.stroomPrijs,
+        cop: formValues.cop,
+        installatieKosten: formValues.installatieKosten,
+        isolatieCorrectie: formValues.isolatieCorrectie,
+        subsidieBedrag: formValues.subsidieBedrag,
+      };
       return berekenWarmtepomp(input);
     } catch (error) {
       console.error("Calculation error:", error);
       return null;
     }
-  }, [input]);
+  }, [formValues]);
 
   return (
     <CalculatorLayout
@@ -41,22 +66,23 @@ export default function WarmtepompCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
 
             <div className="space-y-5">
-              <InputField
+              <InputFieldRHF
                 label="Jaarlijks gasverbruik"
                 name="gasVerbruik"
                 type="number"
-                value={input.gasVerbruik}
-                onChange={(val) => setInput({ ...input, gasVerbruik: Number(val) })}
+                register={register("gasVerbruik", { valueAsNumber: true })}
+                error={errors.gasVerbruik}
                 min={0}
                 step={100}
                 unit="m³/jaar"
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Woningtype"
                 name="woningType"
-                value={input.woningType}
-                onChange={(val) => setInput({ ...input, woningType: val as any })}
+                register={register("woningType")}
+                error={errors.woningType}
                 options={[
                   { value: "appartement", label: "Appartement" },
                   { value: "tussenwoning", label: "Tussenwoning" },
@@ -64,74 +90,78 @@ export default function WarmtepompCalculator() {
                   { value: "2-onder-1-kap", label: "2-onder-1-kap" },
                   { value: "vrijstaand", label: "Vrijstaand" },
                 ]}
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Isolatieniveau"
                 name="isolatieNiveau"
-                value={input.isolatieNiveau}
-                onChange={(val) => setInput({ ...input, isolatieNiveau: val as any })}
+                register={register("isolatieNiveau")}
+                error={errors.isolatieNiveau}
                 options={[
                   { value: "slecht", label: "Slecht" },
                   { value: "matig", label: "Matig" },
                   { value: "goed", label: "Goed" },
                 ]}
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Warmtepomp type"
                 name="warmtepompType"
-                value={input.warmtepompType}
-                onChange={(val) => setInput({ ...input, warmtepompType: val as any })}
+                register={register("warmtepompType")}
+                error={errors.warmtepompType}
                 options={[
                   { value: "hybride", label: "Hybride (met CV-ketel)" },
                   { value: "all-electric", label: "All-electric" },
                 ]}
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Gasprijs"
                 name="gasPrijs"
                 type="number"
-                value={input.gasPrijs}
-                onChange={(val) => setInput({ ...input, gasPrijs: Number(val) })}
+                register={register("gasPrijs", { valueAsNumber: true })}
+                error={errors.gasPrijs}
                 min={0}
                 step={0.01}
                 unit="€/m³"
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Stroomprijs"
                 name="stroomPrijs"
                 type="number"
-                value={input.stroomPrijs}
-                onChange={(val) => setInput({ ...input, stroomPrijs: Number(val) })}
+                register={register("stroomPrijs", { valueAsNumber: true })}
+                error={errors.stroomPrijs}
                 min={0}
                 step={0.01}
                 unit="€/kWh"
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="COP (Coefficient of Performance)"
                 name="cop"
                 type="number"
-                value={input.cop || 4}
-                onChange={(val) => setInput({ ...input, cop: Number(val) })}
+                register={register("cop", { valueAsNumber: true })}
+                error={errors.cop}
                 min={3}
                 max={5}
                 step={0.1}
                 unit=""
                 helpText="Moderne warmtepompen hebben een COP van 3-5. Standaard: 4"
+                defaultValue={4}
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Extra isolatiecorrectie (optioneel)"
                 name="isolatieCorrectie"
                 type="number"
-                value={input.isolatieCorrectie || ""}
-                onChange={(val) =>
-                  setInput({ ...input, isolatieCorrectie: val ? Number(val) : undefined })
-                }
+                register={register("isolatieCorrectie", { valueAsNumber: true })}
+                error={errors.isolatieCorrectie}
                 min={0}
                 max={50}
                 step={5}
@@ -139,28 +169,24 @@ export default function WarmtepompCalculator() {
                 helpText="Extra isolatieverbetering in % (0-50%). Verlaagt benodigd vermogen."
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Installatiekosten (optioneel)"
                 name="installatieKosten"
                 type="number"
-                value={input.installatieKosten || ""}
-                onChange={(val) =>
-                  setInput({ ...input, installatieKosten: val ? Number(val) : undefined })
-                }
+                register={register("installatieKosten", { valueAsNumber: true })}
+                error={errors.installatieKosten}
                 min={0}
                 step={1000}
                 unit="€"
                 helpText="Voor berekening terugverdientijd"
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Subsidiebedrag (optioneel)"
                 name="subsidieBedrag"
                 type="number"
-                value={input.subsidieBedrag || ""}
-                onChange={(val) =>
-                  setInput({ ...input, subsidieBedrag: val ? Number(val) : undefined })
-                }
+                register={register("subsidieBedrag", { valueAsNumber: true })}
+                error={errors.subsidieBedrag}
                 min={0}
                 step={100}
                 unit="€"

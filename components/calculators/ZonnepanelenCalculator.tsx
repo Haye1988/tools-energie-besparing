@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { berekenZonnepanelen, ZonnepanelenInput } from "@/lib/calculations/zonnepanelen";
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import { useCalculationTracking } from "@/lib/hooks/useCalculationTracking";
+import { zonnepanelenSchema, ZonnepanelenFormData } from "@/lib/validations/zonnepanelen.schema";
 import CalculatorLayout from "@/components/shared/CalculatorLayout";
-import InputField from "@/components/shared/InputField";
-import SelectField from "@/components/shared/SelectField";
+import InputFieldRHF from "@/components/shared/InputFieldRHF";
+import SelectFieldRHF from "@/components/shared/SelectFieldRHF";
 import RangeSlider from "@/components/shared/RangeSlider";
 import ResultCard from "@/components/shared/ResultCard";
 import GraphChart from "@/components/shared/GraphChart";
@@ -13,29 +17,56 @@ import LeadForm from "@/components/shared/LeadForm";
 import { Sun, Zap, TrendingUp, Euro } from "lucide-react";
 
 export default function ZonnepanelenCalculator() {
-  const [input, setInput] = useState<ZonnepanelenInput>({
-    jaarlijksVerbruik: 3500,
-    dakOrientatie: "zuid",
-    dakHellingshoek: 35,
-    paneelVermogen: 400,
-    stroomPrijs: 0.3,
-    schaduwPercentage: 0,
-    salderingActief: true,
-    terugleverVergoeding: 0.08,
-    thuisbatterij: false,
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<ZonnepanelenFormData>({
+    resolver: zodResolver(zonnepanelenSchema),
+    defaultValues: {
+      jaarlijksVerbruik: 3500,
+      dakOrientatie: "zuid",
+      dakHellingshoek: 35,
+      paneelVermogen: 400,
+      stroomPrijs: 0.3,
+      schaduwPercentage: 0,
+      salderingActief: true,
+      terugleverVergoeding: 0.08,
+      thuisbatterij: false,
+    },
+    mode: "onChange",
   });
 
+  const formValues = watch();
   // Debounce input voor betere performance bij snelle wijzigingen
-  const debouncedInput = useDebounce(input, 300);
+  const debouncedInput = useDebounce(formValues, 300);
 
   const result = useMemo(() => {
     try {
-      return berekenZonnepanelen(debouncedInput);
+      // Convert form data to calculation input
+      const input: ZonnepanelenInput = {
+        jaarlijksVerbruik: debouncedInput.jaarlijksVerbruik,
+        dakOrientatie: debouncedInput.dakOrientatie,
+        dakHellingshoek: debouncedInput.dakHellingshoek,
+        dakoppervlak: debouncedInput.dakoppervlak,
+        paneelVermogen: debouncedInput.paneelVermogen,
+        stroomPrijs: debouncedInput.stroomPrijs,
+        schaduwPercentage: debouncedInput.schaduwPercentage,
+        investeringsKosten: debouncedInput.investeringsKosten,
+        salderingActief: debouncedInput.salderingActief,
+        terugleverVergoeding: debouncedInput.terugleverVergoeding,
+        thuisbatterij: debouncedInput.thuisbatterij,
+      };
+      return berekenZonnepanelen(input);
     } catch (error) {
       console.error("Calculation error:", error);
       return null;
     }
   }, [debouncedInput]);
+
+  // Track calculation completion
+  useCalculationTracking("zonnepanelen", result);
 
   // Maandelijkse data voor grafiek (vereenvoudigd - gelijkmatige verdeling)
   const maandelijkseData = useMemo(() => {
@@ -54,7 +85,7 @@ export default function ZonnepanelenCalculator() {
       "Nov",
       "Dec",
     ];
-    const maandelijksVerbruik = debouncedInput.jaarlijksVerbruik / 12;
+    const maandelijksVerbruik = formValues.jaarlijksVerbruik / 12;
     const maandelijksOpwekking = result.jaarlijkseOpwekking / 12;
 
     // Seizoenscorrectie: zomer meer opwekking, winter minder
@@ -65,7 +96,7 @@ export default function ZonnepanelenCalculator() {
       verbruik: Math.round(maandelijksVerbruik),
       opwekking: Math.round(maandelijksOpwekking * seizoensfactoren[index]!),
     }));
-  }, [result, debouncedInput.jaarlijksVerbruik]);
+  }, [result, formValues.jaarlijksVerbruik]);
 
   return (
     <CalculatorLayout
@@ -80,22 +111,23 @@ export default function ZonnepanelenCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
 
             <div className="space-y-5">
-              <InputField
+              <InputFieldRHF
                 label="Jaarlijks stroomverbruik"
                 name="jaarlijksVerbruik"
                 type="number"
-                value={input.jaarlijksVerbruik}
-                onChange={(val) => setInput({ ...input, jaarlijksVerbruik: Number(val) })}
+                register={register("jaarlijksVerbruik", { valueAsNumber: true })}
+                error={errors.jaarlijksVerbruik}
                 min={0}
                 step={100}
                 unit="kWh/jaar"
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Dakoriëntatie"
                 name="dakOrientatie"
-                value={input.dakOrientatie}
-                onChange={(val) => setInput({ ...input, dakOrientatie: val as any })}
+                register={register("dakOrientatie")}
+                error={errors.dakOrientatie}
                 options={[
                   { value: "zuid", label: "Zuid (optimaal)" },
                   { value: "zuidoost", label: "Zuidoost" },
@@ -104,49 +136,53 @@ export default function ZonnepanelenCalculator() {
                   { value: "west", label: "West" },
                   { value: "noord", label: "Noord" },
                 ]}
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Dakhellingshoek"
                 name="dakHellingshoek"
                 type="number"
-                value={input.dakHellingshoek}
-                onChange={(val) => setInput({ ...input, dakHellingshoek: Number(val) })}
+                register={register("dakHellingshoek", { valueAsNumber: true })}
+                error={errors.dakHellingshoek}
                 min={0}
                 max={90}
                 step={5}
                 unit="°"
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Vermogen per paneel"
                 name="paneelVermogen"
                 type="number"
-                value={input.paneelVermogen}
-                onChange={(val) => setInput({ ...input, paneelVermogen: Number(val) })}
+                register={register("paneelVermogen", { valueAsNumber: true })}
+                error={errors.paneelVermogen}
                 min={200}
                 max={600}
                 step={50}
                 unit="Wp"
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Stroomprijs"
                 name="stroomPrijs"
                 type="number"
-                value={input.stroomPrijs}
-                onChange={(val) => setInput({ ...input, stroomPrijs: Number(val) })}
+                register={register("stroomPrijs", { valueAsNumber: true })}
+                error={errors.stroomPrijs}
                 min={0}
                 max={1}
                 step={0.01}
                 unit="€/kWh"
+                required
               />
 
               <RangeSlider
                 label="Schaduwpercentage"
                 name="schaduwPercentage"
-                value={input.schaduwPercentage || 0}
-                onChange={(val) => setInput({ ...input, schaduwPercentage: val })}
+                value={formValues.schaduwPercentage || 0}
+                onChange={(val) => setValue("schaduwPercentage", val)}
                 min={0}
                 max={50}
                 step={5}
@@ -158,8 +194,7 @@ export default function ZonnepanelenCalculator() {
                 <input
                   type="checkbox"
                   id="salderingActief"
-                  checked={input.salderingActief ?? true}
-                  onChange={(e) => setInput({ ...input, salderingActief: e.target.checked })}
+                  {...register("salderingActief")}
                   className="w-4 h-4 text-totaaladvies-orange border-gray-300 rounded focus:ring-totaaladvies-orange"
                 />
                 <label
@@ -170,18 +205,19 @@ export default function ZonnepanelenCalculator() {
                 </label>
               </div>
 
-              {!input.salderingActief && (
-                <InputField
+              {!formValues.salderingActief && (
+                <InputFieldRHF
                   label="Terugleververgoeding"
                   name="terugleverVergoeding"
                   type="number"
-                  value={input.terugleverVergoeding ?? 0.08}
-                  onChange={(val) => setInput({ ...input, terugleverVergoeding: Number(val) })}
+                  register={register("terugleverVergoeding", { valueAsNumber: true })}
+                  error={errors.terugleverVergoeding}
                   min={0}
                   max={0.5}
                   step={0.01}
                   unit="€/kWh"
                   helpText="Vergoeding voor teruggeleverde stroom (standaard €0.08/kWh)"
+                  defaultValue={0.08}
                 />
               )}
 
@@ -189,8 +225,7 @@ export default function ZonnepanelenCalculator() {
                 <input
                   type="checkbox"
                   id="thuisbatterij"
-                  checked={input.thuisbatterij ?? false}
-                  onChange={(e) => setInput({ ...input, thuisbatterij: e.target.checked })}
+                  {...register("thuisbatterij")}
                   className="w-4 h-4 text-totaaladvies-orange border-gray-300 rounded focus:ring-totaaladvies-orange"
                 />
                 <label
@@ -201,7 +236,7 @@ export default function ZonnepanelenCalculator() {
                 </label>
               </div>
 
-              {input.thuisbatterij && (
+              {formValues.thuisbatterij && (
                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-sm text-blue-900">
                     De batterijcapaciteit wordt automatisch berekend op basis van uw zonnepaneel
@@ -210,14 +245,12 @@ export default function ZonnepanelenCalculator() {
                 </div>
               )}
 
-              <InputField
+              <InputFieldRHF
                 label="Investeringskosten (optioneel)"
                 name="investeringsKosten"
                 type="number"
-                value={input.investeringsKosten || ""}
-                onChange={(val) =>
-                  setInput({ ...input, investeringsKosten: val ? Number(val) : undefined })
-                }
+                register={register("investeringsKosten", { valueAsNumber: true })}
+                error={errors.investeringsKosten}
                 min={0}
                 step={1000}
                 unit="€"
@@ -272,7 +305,7 @@ export default function ZonnepanelenCalculator() {
                     <strong className="text-totaaladvies-blue">
                       {result.aantalPanelen} zonnepanelen
                     </strong>{" "}
-                    van {input.paneelVermogen} Wp wek je ongeveer{" "}
+                    van {formValues.paneelVermogen} Wp wek je ongeveer{" "}
                     <strong className="text-totaaladvies-blue">
                       {result.jaarlijkseOpwekking.toLocaleString("nl-NL")} kWh
                     </strong>{" "}

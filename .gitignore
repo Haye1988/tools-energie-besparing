@@ -45,3 +45,6 @@ playwright/.cache
 # sentry
 .sentryclirc
 
+
+*storybook.log
+storybook-static

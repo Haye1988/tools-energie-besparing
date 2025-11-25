@@ -1,39 +1,65 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { berekenIsolatie, IsolatieInput } from "@/lib/calculations/isolatie";
+import { isolatieSchema, IsolatieFormData } from "@/lib/validations/isolatie.schema";
 import CalculatorLayout from "@/components/shared/CalculatorLayout";
-import InputField from "@/components/shared/InputField";
-import SelectField from "@/components/shared/SelectField";
+import InputFieldRHF from "@/components/shared/InputFieldRHF";
+import SelectFieldRHF from "@/components/shared/SelectFieldRHF";
 import ResultCard from "@/components/shared/ResultCard";
 import LeadForm from "@/components/shared/LeadForm";
 
 export default function IsolatieCalculator() {
-  const [input, setInput] = useState<IsolatieInput>({
-    woningType: "tussenwoning",
-    gasVerbruik: 1200,
-    maatregelen: [],
-    huidigGlasType: "dubbel",
-    gasPrijs: 1.2,
-    investeringsKosten: {},
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<IsolatieFormData>({
+    resolver: zodResolver(isolatieSchema),
+    defaultValues: {
+      woningType: "tussenwoning",
+      gasVerbruik: 1200,
+      maatregelen: [],
+      huidigGlasType: "dubbel",
+      gasPrijs: 1.2,
+      investeringsKosten: {},
+    },
+    mode: "onChange",
   });
+
+  const formValues = watch();
 
   const result = useMemo(() => {
     try {
+      const input: IsolatieInput = {
+        woningType: formValues.woningType,
+        gasVerbruik: formValues.gasVerbruik,
+        maatregelen: formValues.maatregelen,
+        huidigGlasType: formValues.huidigGlasType,
+        gasPrijs: formValues.gasPrijs,
+        bouwjaar: formValues.bouwjaar,
+        huidigeIsolatieDak: formValues.huidigeIsolatieDak,
+        huidigeIsolatieSpouw: formValues.huidigeIsolatieSpouw,
+        huidigeIsolatieVloer: formValues.huidigeIsolatieVloer,
+        investeringsKosten: formValues.investeringsKosten,
+        subsidieBedrag: formValues.subsidieBedrag,
+      };
       return berekenIsolatie(input);
     } catch (error) {
       console.error("Calculation error:", error);
       return null;
     }
-  }, [input]);
+  }, [formValues]);
 
   const toggleMaatregel = (maatregel: "dak" | "spouw" | "vloer" | "glas") => {
-    setInput({
-      ...input,
-      maatregelen: input.maatregelen.includes(maatregel)
-        ? input.maatregelen.filter((m) => m !== maatregel)
-        : [...input.maatregelen, maatregel],
-    });
+    const currentMaatregelen = formValues.maatregelen || [];
+    const newMaatregelen = currentMaatregelen.includes(maatregel)
+      ? currentMaatregelen.filter((m) => m !== maatregel)
+      : [...currentMaatregelen, maatregel];
+    setValue("maatregelen", newMaatregelen);
   };
 
   return (
@@ -49,11 +75,11 @@ export default function IsolatieCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
 
             <div className="space-y-5">
-              <SelectField
+              <SelectFieldRHF
                 label="Woningtype"
                 name="woningType"
-                value={input.woningType}
-                onChange={(val) => setInput({ ...input, woningType: val as any })}
+                register={register("woningType")}
+                error={errors.woningType}
                 options={[
                   { value: "appartement", label: "Appartement" },
                   { value: "tussenwoning", label: "Tussenwoning" },
@@ -61,25 +87,27 @@ export default function IsolatieCalculator() {
                   { value: "2-onder-1-kap", label: "2-onder-1-kap" },
                   { value: "vrijstaand", label: "Vrijstaand" },
                 ]}
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Jaarlijks gasverbruik"
                 name="gasVerbruik"
                 type="number"
-                value={input.gasVerbruik}
-                onChange={(val) => setInput({ ...input, gasVerbruik: Number(val) })}
+                register={register("gasVerbruik", { valueAsNumber: true })}
+                error={errors.gasVerbruik}
                 min={0}
                 step={100}
                 unit="m³/jaar"
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Bouwjaar (optioneel)"
                 name="bouwjaar"
                 type="number"
-                value={input.bouwjaar || ""}
-                onChange={(val) => setInput({ ...input, bouwjaar: val ? Number(val) : undefined })}
+                register={register("bouwjaar", { valueAsNumber: true })}
+                error={errors.bouwjaar}
                 min={1900}
                 max={new Date().getFullYear()}
                 step={1}
@@ -91,12 +119,17 @@ export default function IsolatieCalculator() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Te isoleren onderdelen
                 </label>
+                {errors.maatregelen && (
+                  <p className="text-xs text-red-600 mb-2" role="alert">
+                    {errors.maatregelen.message}
+                  </p>
+                )}
                 <div className="space-y-2">
                   {(["dak", "spouw", "vloer", "glas"] as const).map((maatregel) => (
                     <label key={maatregel} className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={input.maatregelen.includes(maatregel)}
+                        checked={(formValues.maatregelen || []).includes(maatregel)}
                         onChange={() => toggleMaatregel(maatregel)}
                         className="w-4 h-4"
                       />
@@ -112,95 +145,94 @@ export default function IsolatieCalculator() {
                 </div>
               </div>
 
-              {input.maatregelen.includes("dak") && (
-                <SelectField
+              {(formValues.maatregelen || []).includes("dak") && (
+                <SelectFieldRHF
                   label="Huidige dakisolatie"
                   name="huidigeIsolatieDak"
-                  value={input.huidigeIsolatieDak || "geen"}
-                  onChange={(val) => setInput({ ...input, huidigeIsolatieDak: val as any })}
+                  register={register("huidigeIsolatieDak")}
+                  error={errors.huidigeIsolatieDak}
                   options={[
                     { value: "geen", label: "Geen isolatie" },
                     { value: "matig", label: "Matige isolatie" },
                     { value: "goed", label: "Goede isolatie" },
                   ]}
+                  defaultValue="geen"
                 />
               )}
 
-              {input.maatregelen.includes("spouw") && (
-                <SelectField
+              {(formValues.maatregelen || []).includes("spouw") && (
+                <SelectFieldRHF
                   label="Huidige spouwmuurisolatie"
                   name="huidigeIsolatieSpouw"
-                  value={input.huidigeIsolatieSpouw || "geen"}
-                  onChange={(val) => setInput({ ...input, huidigeIsolatieSpouw: val as any })}
+                  register={register("huidigeIsolatieSpouw")}
+                  error={errors.huidigeIsolatieSpouw}
                   options={[
                     { value: "geen", label: "Geen isolatie" },
                     { value: "matig", label: "Matige isolatie" },
                     { value: "goed", label: "Goede isolatie" },
                   ]}
+                  defaultValue="geen"
                 />
               )}
 
-              {input.maatregelen.includes("vloer") && (
-                <SelectField
+              {(formValues.maatregelen || []).includes("vloer") && (
+                <SelectFieldRHF
                   label="Huidige vloerisolatie"
                   name="huidigeIsolatieVloer"
-                  value={input.huidigeIsolatieVloer || "geen"}
-                  onChange={(val) => setInput({ ...input, huidigeIsolatieVloer: val as any })}
+                  register={register("huidigeIsolatieVloer")}
+                  error={errors.huidigeIsolatieVloer}
                   options={[
                     { value: "geen", label: "Geen isolatie" },
                     { value: "matig", label: "Matige isolatie" },
                     { value: "goed", label: "Goede isolatie" },
                   ]}
+                  defaultValue="geen"
                 />
               )}
 
-              {input.maatregelen.includes("glas") && (
-                <SelectField
+              {(formValues.maatregelen || []).includes("glas") && (
+                <SelectFieldRHF
                   label="Huidig glastype"
                   name="huidigGlasType"
-                  value={input.huidigGlasType ?? "dubbel"}
-                  onChange={(val) => setInput({ ...input, huidigGlasType: val as any })}
+                  register={register("huidigGlasType")}
+                  error={errors.huidigGlasType}
                   options={[
                     { value: "enkel", label: "Enkel glas" },
                     { value: "dubbel", label: "Dubbel glas" },
                     { value: "hr", label: "HR glas" },
                   ]}
+                  defaultValue="dubbel"
                 />
               )}
 
-              <InputField
+              <InputFieldRHF
                 label="Gasprijs"
                 name="gasPrijs"
                 type="number"
-                value={input.gasPrijs ?? 1.2}
-                onChange={(val) => setInput({ ...input, gasPrijs: Number(val) })}
+                register={register("gasPrijs", { valueAsNumber: true })}
+                error={errors.gasPrijs}
                 min={0}
                 step={0.01}
                 unit="€/m³"
+                defaultValue={1.2}
               />
 
-              {input.maatregelen.length > 0 && (
+              {(formValues.maatregelen || []).length > 0 && (
                 <div className="pt-4 border-t border-gray-200">
                   <h3 className="text-sm font-semibold text-gray-900 mb-3">
                     Investeringskosten (optioneel)
                   </h3>
                   <div className="space-y-3">
-                    {input.maatregelen.map((maatregel) => (
-                      <InputField
+                    {(formValues.maatregelen || []).map((maatregel) => (
+                      <InputFieldRHF
                         key={maatregel}
                         label={`${maatregel === "spouw" ? "Spouwmuur" : maatregel === "glas" ? "HR++ glas" : maatregel} isolatie`}
-                        name={`investeringsKosten_${maatregel}`}
+                        name={`investeringsKosten.${maatregel}`}
                         type="number"
-                        value={input.investeringsKosten?.[maatregel] || ""}
-                        onChange={(val) =>
-                          setInput({
-                            ...input,
-                            investeringsKosten: {
-                              ...input.investeringsKosten,
-                              [maatregel]: val ? Number(val) : undefined,
-                            },
-                          })
-                        }
+                        register={register(`investeringsKosten.${maatregel}` as any, {
+                          valueAsNumber: true,
+                        })}
+                        error={errors.investeringsKosten?.[maatregel]}
                         min={0}
                         step={100}
                         unit="€"
@@ -210,15 +242,13 @@ export default function IsolatieCalculator() {
                 </div>
               )}
 
-              {input.maatregelen.length > 0 && (
-                <InputField
+              {(formValues.maatregelen || []).length > 0 && (
+                <InputFieldRHF
                   label="Subsidiebedrag (optioneel)"
                   name="subsidieBedrag"
                   type="number"
-                  value={input.subsidieBedrag || ""}
-                  onChange={(val) =>
-                    setInput({ ...input, subsidieBedrag: val ? Number(val) : undefined })
-                  }
+                  register={register("subsidieBedrag", { valueAsNumber: true })}
+                  error={errors.subsidieBedrag}
                   min={0}
                   step={100}
                   unit="€"

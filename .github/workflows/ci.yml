@@ -57,3 +57,25 @@ jobs:
           name: build
           path: .next
 
+  lighthouse:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            https://tools-energie-besparing.vercel.app/
+            https://tools-energie-besparing.vercel.app/zonnepanelen
+            https://tools-energie-besparing.vercel.app/warmtepomp
+            https://tools-energie-besparing.vercel.app/isolatie
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          configPath: .lighthouserc.json
+

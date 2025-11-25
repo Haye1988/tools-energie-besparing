@@ -24,12 +24,36 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log error to Sentry
+    // Add breadcrumb for error context
+    Sentry.addBreadcrumb({
+      category: "error-boundary",
+      message: "Error caught by ErrorBoundary",
+      level: "error",
+      data: {
+        componentStack: errorInfo.componentStack,
+        errorMessage: error.message,
+        errorName: error.name,
+      },
+    });
+
+    // Log error to Sentry with enhanced context
     Sentry.captureException(error, {
       contexts: {
         react: {
           componentStack: errorInfo.componentStack,
         },
+        browser: {
+          url: typeof window !== "undefined" ? window.location.href : undefined,
+          userAgent: typeof window !== "undefined" ? window.navigator.userAgent : undefined,
+        },
+      },
+      tags: {
+        errorBoundary: true,
+        errorType: error.name,
+      },
+      extra: {
+        errorInfo,
+        timestamp: new Date().toISOString(),
       },
     });
 

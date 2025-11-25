@@ -1,31 +1,54 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { berekenCvKetel, CvKetelInput } from "@/lib/calculations/cv-ketel";
+import { cvKetelSchema, CvKetelFormData } from "@/lib/validations/cv-ketel.schema";
 import CalculatorLayout from "@/components/shared/CalculatorLayout";
-import InputField from "@/components/shared/InputField";
-import SelectField from "@/components/shared/SelectField";
+import InputFieldRHF from "@/components/shared/InputFieldRHF";
+import SelectFieldRHF from "@/components/shared/SelectFieldRHF";
 import ResultCard from "@/components/shared/ResultCard";
 import LeadForm from "@/components/shared/LeadForm";
 
 export default function CvKetelCalculator() {
-  const [input, setInput] = useState<CvKetelInput>({
-    gasVerbruik: 1200,
-    huidigKetelType: "redelijk",
-    aantalPersonen: 4,
-    gewenstSysteem: "hr-ketel",
-    gasPrijs: 1.2,
-    stroomPrijs: 0.27,
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm<CvKetelFormData>({
+    resolver: zodResolver(cvKetelSchema),
+    defaultValues: {
+      gasVerbruik: 1200,
+      huidigKetelType: "redelijk",
+      aantalPersonen: 4,
+      gewenstSysteem: "hr-ketel",
+      gasPrijs: 1.2,
+      stroomPrijs: 0.27,
+    },
+    mode: "onChange",
   });
+
+  const formValues = watch();
 
   const result = useMemo(() => {
     try {
+      const input: CvKetelInput = {
+        gasVerbruik: formValues.gasVerbruik,
+        huidigKetelType: formValues.huidigKetelType,
+        aantalPersonen: formValues.aantalPersonen,
+        gewenstSysteem: formValues.gewenstSysteem,
+        gasPrijs: formValues.gasPrijs,
+        stroomPrijs: formValues.stroomPrijs,
+        ketelLeeftijd: formValues.ketelLeeftijd,
+        installatieKosten: formValues.installatieKosten,
+      };
       return berekenCvKetel(input);
     } catch (error) {
       console.error("Calculation error:", error);
       return null;
     }
-  }, [input]);
+  }, [formValues]);
 
   return (
     <CalculatorLayout
@@ -40,82 +63,86 @@ export default function CvKetelCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
 
             <div className="space-y-5">
-              <InputField
+              <InputFieldRHF
                 label="Jaarlijks gasverbruik"
                 name="gasVerbruik"
                 type="number"
-                value={input.gasVerbruik}
-                onChange={(val) => setInput({ ...input, gasVerbruik: Number(val) })}
+                register={register("gasVerbruik", { valueAsNumber: true })}
+                error={errors.gasVerbruik}
                 min={0}
                 step={100}
                 unit="m³/jaar"
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Type huidige ketel"
                 name="huidigKetelType"
-                value={input.huidigKetelType}
-                onChange={(val) => setInput({ ...input, huidigKetelType: val as any })}
+                register={register("huidigKetelType")}
+                error={errors.huidigKetelType}
                 options={[
                   { value: "oud", label: "Oud (voor 1995, geen HR)" },
                   { value: "redelijk", label: "Redelijk (±2005, HR)" },
                   { value: "nieuw", label: "Nieuw (na 2015, HR+)" },
                 ]}
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Aantal personen"
                 name="aantalPersonen"
                 type="number"
-                value={input.aantalPersonen}
-                onChange={(val) => setInput({ ...input, aantalPersonen: Number(val) })}
+                register={register("aantalPersonen", { valueAsNumber: true })}
+                error={errors.aantalPersonen}
                 min={1}
                 max={10}
                 step={1}
                 unit="personen"
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Gewenst systeem"
                 name="gewenstSysteem"
-                value={input.gewenstSysteem}
-                onChange={(val) => setInput({ ...input, gewenstSysteem: val as any })}
+                register={register("gewenstSysteem")}
+                error={errors.gewenstSysteem}
                 options={[
                   { value: "hr-ketel", label: "Nieuwe HR-ketel" },
                   { value: "hybride", label: "Hybride warmtepomp + ketel" },
                 ]}
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Gasprijs"
                 name="gasPrijs"
                 type="number"
-                value={input.gasPrijs ?? 1.2}
-                onChange={(val) => setInput({ ...input, gasPrijs: Number(val) })}
+                register={register("gasPrijs", { valueAsNumber: true })}
+                error={errors.gasPrijs}
                 min={0}
                 step={0.01}
                 unit="€/m³"
+                defaultValue={1.2}
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Stroomprijs"
                 name="stroomPrijs"
                 type="number"
-                value={input.stroomPrijs ?? 0.27}
-                onChange={(val) => setInput({ ...input, stroomPrijs: Number(val) })}
+                register={register("stroomPrijs", { valueAsNumber: true })}
+                error={errors.stroomPrijs}
                 min={0}
                 step={0.01}
                 unit="€/kWh"
+                defaultValue={0.27}
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Ketelleeftijd (jaren)"
                 name="ketelLeeftijd"
                 type="number"
-                value={input.ketelLeeftijd || ""}
-                onChange={(val) =>
-                  setInput({ ...input, ketelLeeftijd: val ? Number(val) : undefined })
-                }
+                register={register("ketelLeeftijd", { valueAsNumber: true })}
+                error={errors.ketelLeeftijd}
                 min={0}
                 max={50}
                 step={1}
@@ -123,14 +150,12 @@ export default function CvKetelCalculator() {
                 helpText="Voor vervangingsadvies (advies na 15 jaar)"
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Installatiekosten (optioneel)"
                 name="installatieKosten"
                 type="number"
-                value={input.installatieKosten || ""}
-                onChange={(val) =>
-                  setInput({ ...input, installatieKosten: val ? Number(val) : undefined })
-                }
+                register={register("installatieKosten", { valueAsNumber: true })}
+                error={errors.installatieKosten}
                 min={0}
                 step={100}
                 unit="€"

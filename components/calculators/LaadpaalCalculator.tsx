@@ -1,29 +1,56 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { berekenLaadpaal, LaadpaalInput } from "@/lib/calculations/laadpaal";
+import { laadpaalSchema, LaadpaalFormData } from "@/lib/validations/laadpaal.schema";
 import CalculatorLayout from "@/components/shared/CalculatorLayout";
-import InputField from "@/components/shared/InputField";
-import SelectField from "@/components/shared/SelectField";
+import InputFieldRHF from "@/components/shared/InputFieldRHF";
+import SelectFieldRHF from "@/components/shared/SelectFieldRHF";
 import ResultCard from "@/components/shared/ResultCard";
 import LeadForm from "@/components/shared/LeadForm";
 
 export default function LaadpaalCalculator() {
-  const [input, setInput] = useState<LaadpaalInput>({
-    accuCapaciteit: 60,
-    gewensteLaadtijd: 8,
-    huisaansluiting: "1-fase",
-    zonnepanelen: false,
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm<LaadpaalFormData>({
+    resolver: zodResolver(laadpaalSchema),
+    defaultValues: {
+      accuCapaciteit: 60,
+      gewensteLaadtijd: 8,
+      huisaansluiting: "1-fase",
+      zonnepanelen: false,
+      dynamischContract: false,
+      dagTarief: 0.35,
+      nachtTarief: 0.2,
+    },
+    mode: "onChange",
   });
+
+  const formValues = watch();
 
   const result = useMemo(() => {
     try {
+      const input: LaadpaalInput = {
+        accuCapaciteit: formValues.accuCapaciteit,
+        gewensteLaadtijd: formValues.gewensteLaadtijd,
+        huisaansluiting: formValues.huisaansluiting,
+        zonnepanelen: formValues.zonnepanelen,
+        evModel: formValues.evModel,
+        netaansluiting: formValues.netaansluiting,
+        dynamischContract: formValues.dynamischContract,
+        dagTarief: formValues.dagTarief,
+        nachtTarief: formValues.nachtTarief,
+      };
       return berekenLaadpaal(input);
     } catch (error) {
       console.error("Calculation error:", error);
       return null;
     }
-  }, [input]);
+  }, [formValues]);
 
   return (
     <CalculatorLayout
@@ -38,46 +65,48 @@ export default function LaadpaalCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
 
             <div className="space-y-5">
-              <InputField
+              <InputFieldRHF
                 label="Accucapaciteit auto"
                 name="accuCapaciteit"
                 type="number"
-                value={input.accuCapaciteit}
-                onChange={(val) => setInput({ ...input, accuCapaciteit: Number(val) })}
+                register={register("accuCapaciteit", { valueAsNumber: true })}
+                error={errors.accuCapaciteit}
                 min={0}
                 step={5}
                 unit="kWh"
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Gewenste laadtijd"
                 name="gewensteLaadtijd"
                 type="number"
-                value={input.gewensteLaadtijd}
-                onChange={(val) => setInput({ ...input, gewensteLaadtijd: Number(val) })}
+                register={register("gewensteLaadtijd", { valueAsNumber: true })}
+                error={errors.gewensteLaadtijd}
                 min={1}
                 max={24}
                 step={1}
                 unit="uren"
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Huisaansluiting"
                 name="huisaansluiting"
-                value={input.huisaansluiting}
-                onChange={(val) => setInput({ ...input, huisaansluiting: val as any })}
+                register={register("huisaansluiting")}
+                error={errors.huisaansluiting}
                 options={[
                   { value: "1-fase", label: "1-fase (230V)" },
                   { value: "3-fase", label: "3-fase (400V)" },
                 ]}
+                required
               />
 
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   id="zonnepanelen"
-                  checked={input.zonnepanelen}
-                  onChange={(e) => setInput({ ...input, zonnepanelen: e.target.checked })}
+                  {...register("zonnepanelen")}
                   className="w-4 h-4"
                 />
                 <label htmlFor="zonnepanelen" className="text-sm text-gray-700">
@@ -85,36 +114,37 @@ export default function LaadpaalCalculator() {
                 </label>
               </div>
 
-              <InputField
+              <InputFieldRHF
                 label="Dagtarief"
                 name="dagTarief"
                 type="number"
-                value={input.dagTarief ?? 0.35}
-                onChange={(val) => setInput({ ...input, dagTarief: Number(val) })}
+                register={register("dagTarief", { valueAsNumber: true })}
+                error={errors.dagTarief}
                 min={0}
                 step={0.01}
                 unit="€/kWh"
                 helpText="Stroomprijs overdag (standaard €0.35/kWh)"
+                defaultValue={0.35}
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Nachttarief"
                 name="nachtTarief"
                 type="number"
-                value={input.nachtTarief ?? 0.2}
-                onChange={(val) => setInput({ ...input, nachtTarief: Number(val) })}
+                register={register("nachtTarief", { valueAsNumber: true })}
+                error={errors.nachtTarief}
                 min={0}
                 step={0.01}
                 unit="€/kWh"
                 helpText="Stroomprijs 's nachts (standaard €0.20/kWh)"
+                defaultValue={0.2}
               />
 
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   id="dynamischContract"
-                  checked={input.dynamischContract ?? false}
-                  onChange={(e) => setInput({ ...input, dynamischContract: e.target.checked })}
+                  {...register("dynamischContract")}
                   className="w-4 h-4 text-totaaladvies-orange border-gray-300 rounded focus:ring-totaaladvies-orange"
                 />
                 <label

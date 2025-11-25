@@ -1,30 +1,54 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { berekenBoilers, BoilersInput } from "@/lib/calculations/boilers";
+import { boilersSchema, BoilersFormData } from "@/lib/validations/boilers.schema";
 import CalculatorLayout from "@/components/shared/CalculatorLayout";
-import InputField from "@/components/shared/InputField";
-import SelectField from "@/components/shared/SelectField";
+import InputFieldRHF from "@/components/shared/InputFieldRHF";
+import SelectFieldRHF from "@/components/shared/SelectFieldRHF";
 import ResultCard from "@/components/shared/ResultCard";
 import LeadForm from "@/components/shared/LeadForm";
 
 export default function BoilersCalculator() {
-  const [input, setInput] = useState<BoilersInput>({
-    aantalPersonen: 4,
-    warmwaterBehoefte: "gemiddeld",
-    huidigSysteem: "cv-boiler",
-    stroomPrijs: 0.27,
-    gasPrijs: 1.2,
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm<BoilersFormData>({
+    resolver: zodResolver(boilersSchema),
+    defaultValues: {
+      aantalPersonen: 4,
+      warmwaterBehoefte: "gemiddeld",
+      huidigSysteem: "cv-boiler",
+      stroomPrijs: 0.27,
+      gasPrijs: 1.2,
+    },
+    mode: "onChange",
   });
+
+  const formValues = watch();
 
   const result = useMemo(() => {
     try {
+      const input: BoilersInput = {
+        aantalPersonen: formValues.aantalPersonen,
+        warmwaterBehoefte: formValues.warmwaterBehoefte,
+        huidigSysteem: formValues.huidigSysteem,
+        stroomPrijs: formValues.stroomPrijs,
+        gasPrijs: formValues.gasPrijs,
+        doucheMinutenPerDag: formValues.doucheMinutenPerDag,
+        aantalBadenPerWeek: formValues.aantalBadenPerWeek,
+        boilerLocatie: formValues.boilerLocatie,
+        investeringsKosten: formValues.investeringsKosten,
+      };
       return berekenBoilers(input);
     } catch (error) {
       console.error("Calculation error:", error);
       return null;
     }
-  }, [input]);
+  }, [formValues]);
 
   return (
     <CalculatorLayout
@@ -39,62 +63,67 @@ export default function BoilersCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
 
             <div className="space-y-5">
-              <InputField
+              <InputFieldRHF
                 label="Aantal personen"
                 name="aantalPersonen"
                 type="number"
-                value={input.aantalPersonen}
-                onChange={(val) => setInput({ ...input, aantalPersonen: Number(val) })}
+                register={register("aantalPersonen", { valueAsNumber: true })}
+                error={errors.aantalPersonen}
                 min={1}
                 max={10}
                 step={1}
                 unit="personen"
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Warmwater behoefte"
                 name="warmwaterBehoefte"
-                value={input.warmwaterBehoefte ?? "gemiddeld"}
-                onChange={(val) => setInput({ ...input, warmwaterBehoefte: val as any })}
+                register={register("warmwaterBehoefte")}
+                error={errors.warmwaterBehoefte}
                 options={[
                   { value: "laag", label: "Laag" },
                   { value: "gemiddeld", label: "Gemiddeld" },
                   { value: "hoog", label: "Hoog" },
                 ]}
+                defaultValue="gemiddeld"
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Huidig systeem"
                 name="huidigSysteem"
-                value={input.huidigSysteem}
-                onChange={(val) => setInput({ ...input, huidigSysteem: val as any })}
+                register={register("huidigSysteem")}
+                error={errors.huidigSysteem}
                 options={[
                   { value: "cv-boiler", label: "CV-boiler" },
                   { value: "elektrisch", label: "Elektrische boiler" },
                   { value: "geen", label: "Geen boiler" },
                 ]}
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Stroomprijs"
                 name="stroomPrijs"
                 type="number"
-                value={input.stroomPrijs ?? 0.27}
-                onChange={(val) => setInput({ ...input, stroomPrijs: Number(val) })}
+                register={register("stroomPrijs", { valueAsNumber: true })}
+                error={errors.stroomPrijs}
                 min={0}
                 step={0.01}
                 unit="€/kWh"
+                defaultValue={0.27}
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Gasprijs"
                 name="gasPrijs"
                 type="number"
-                value={input.gasPrijs ?? 1.2}
-                onChange={(val) => setInput({ ...input, gasPrijs: Number(val) })}
+                register={register("gasPrijs", { valueAsNumber: true })}
+                error={errors.gasPrijs}
                 min={0}
                 step={0.01}
                 unit="€/m³"
+                defaultValue={1.2}
               />
             </div>
           </div>

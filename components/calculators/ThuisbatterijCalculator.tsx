@@ -1,31 +1,55 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { berekenThuisbatterij, ThuisbatterijInput } from "@/lib/calculations/thuisbatterij";
+import { thuisbatterijSchema, ThuisbatterijFormData } from "@/lib/validations/thuisbatterij.schema";
 import CalculatorLayout from "@/components/shared/CalculatorLayout";
-import InputField from "@/components/shared/InputField";
-import SelectField from "@/components/shared/SelectField";
+import InputFieldRHF from "@/components/shared/InputFieldRHF";
+import SelectFieldRHF from "@/components/shared/SelectFieldRHF";
 import ResultCard from "@/components/shared/ResultCard";
 import LeadForm from "@/components/shared/LeadForm";
 
 export default function ThuisbatterijCalculator() {
-  const [input, setInput] = useState<ThuisbatterijInput>({
-    zonnepaneelVermogen: 5,
-    jaarlijksVerbruik: 4000,
-    doel: "eigen-verbruik",
-    salderingActief: true,
-    stroomPrijs: 0.27,
-    terugleverVergoeding: 0.08,
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm<ThuisbatterijFormData>({
+    resolver: zodResolver(thuisbatterijSchema),
+    defaultValues: {
+      zonnepaneelVermogen: 5,
+      jaarlijksVerbruik: 4000,
+      doel: "eigen-verbruik",
+      salderingActief: true,
+      stroomPrijs: 0.27,
+      terugleverVergoeding: 0.08,
+    },
+    mode: "onChange",
   });
+
+  const formValues = watch();
 
   const result = useMemo(() => {
     try {
+      const input: ThuisbatterijInput = {
+        zonnepaneelVermogen: formValues.zonnepaneelVermogen,
+        jaarlijksVerbruik: formValues.jaarlijksVerbruik,
+        jaarlijkseOpwekking: formValues.jaarlijkseOpwekking,
+        doel: formValues.doel,
+        gewensteAutonomie: formValues.gewensteAutonomie,
+        salderingActief: formValues.salderingActief,
+        stroomPrijs: formValues.stroomPrijs,
+        terugleverVergoeding: formValues.terugleverVergoeding,
+        investeringsKosten: formValues.investeringsKosten,
+      };
       return berekenThuisbatterij(input);
     } catch (error) {
       console.error("Calculation error:", error);
       return null;
     }
-  }, [input]);
+  }, [formValues]);
 
   return (
     <CalculatorLayout
@@ -40,51 +64,55 @@ export default function ThuisbatterijCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
 
             <div className="space-y-5">
-              <InputField
+              <InputFieldRHF
                 label="Zonnepaneel vermogen"
                 name="zonnepaneelVermogen"
                 type="number"
-                value={input.zonnepaneelVermogen}
-                onChange={(val) => setInput({ ...input, zonnepaneelVermogen: Number(val) })}
+                register={register("zonnepaneelVermogen", { valueAsNumber: true })}
+                error={errors.zonnepaneelVermogen}
                 min={0}
                 step={0.5}
                 unit="kWp"
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Jaarlijks stroomverbruik"
                 name="jaarlijksVerbruik"
                 type="number"
-                value={input.jaarlijksVerbruik}
-                onChange={(val) => setInput({ ...input, jaarlijksVerbruik: Number(val) })}
+                register={register("jaarlijksVerbruik", { valueAsNumber: true })}
+                error={errors.jaarlijksVerbruik}
                 min={0}
                 step={100}
                 unit="kWh/jaar"
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Doel"
                 name="doel"
-                value={input.doel}
-                onChange={(val) => setInput({ ...input, doel: val as any })}
+                register={register("doel")}
+                error={errors.doel}
                 options={[
                   { value: "eigen-verbruik", label: "Maximaal eigen verbruik verhogen" },
                   { value: "backup", label: "Backup bij stroomuitval" },
                   { value: "dynamisch", label: "Profiteren van dynamische tarieven" },
                 ]}
+                required
               />
 
-              {input.doel === "backup" && (
-                <InputField
+              {formValues.doel === "backup" && (
+                <InputFieldRHF
                   label="Gewenste autonomie"
                   name="gewensteAutonomie"
                   type="number"
-                  value={input.gewensteAutonomie ?? 4}
-                  onChange={(val) => setInput({ ...input, gewensteAutonomie: Number(val) })}
+                  register={register("gewensteAutonomie", { valueAsNumber: true })}
+                  error={errors.gewensteAutonomie}
                   min={1}
                   max={24}
                   step={1}
                   unit="uren"
+                  defaultValue={4}
                 />
               )}
 
@@ -92,8 +120,7 @@ export default function ThuisbatterijCalculator() {
                 <input
                   type="checkbox"
                   id="salderingActief"
-                  checked={input.salderingActief}
-                  onChange={(e) => setInput({ ...input, salderingActief: e.target.checked })}
+                  {...register("salderingActief")}
                   className="w-4 h-4"
                 />
                 <label htmlFor="salderingActief" className="text-sm text-gray-700">
@@ -101,15 +128,16 @@ export default function ThuisbatterijCalculator() {
                 </label>
               </div>
 
-              <InputField
+              <InputFieldRHF
                 label="Stroomprijs"
                 name="stroomPrijs"
                 type="number"
-                value={input.stroomPrijs ?? 0.27}
-                onChange={(val) => setInput({ ...input, stroomPrijs: Number(val) })}
+                register={register("stroomPrijs", { valueAsNumber: true })}
+                error={errors.stroomPrijs}
                 min={0}
                 step={0.01}
                 unit="€/kWh"
+                defaultValue={0.27}
               />
             </div>
           </div>

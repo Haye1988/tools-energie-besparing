@@ -1,8 +1,9 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import Link from "next/link";
 import { isEmbedMode } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics/posthog";
 import EmbedWrapper from "./EmbedWrapper";
 import AIChat from "./AIChat";
 import { ToolName } from "@/types/calculator";
@@ -25,6 +26,13 @@ export default function CalculatorLayout({
   context = {},
 }: CalculatorLayoutProps) {
   const embed = isEmbedMode();
+
+  useEffect(() => {
+    trackEvent("calculator_viewed", {
+      tool,
+      hasContext: Object.keys(context).length > 0,
+    });
+  }, [tool, context]);
 
   return (
     <EmbedWrapper>

@@ -1,30 +1,60 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { berekenEnergiecontract, EnergiecontractInput } from "@/lib/calculations/energiecontract";
+import {
+  energiecontractSchema,
+  EnergiecontractFormData,
+} from "@/lib/validations/energiecontract.schema";
 import CalculatorLayout from "@/components/shared/CalculatorLayout";
-import InputField from "@/components/shared/InputField";
+import InputFieldRHF from "@/components/shared/InputFieldRHF";
 import ResultCard from "@/components/shared/ResultCard";
 import LeadForm from "@/components/shared/LeadForm";
 
 export default function EnergiecontractCalculator() {
-  const [input, setInput] = useState<EnergiecontractInput>({
-    huidigStroomPrijs: 0.35,
-    huidigGasPrijs: 1.5,
-    nieuwStroomPrijs: 0.27,
-    nieuwGasPrijs: 1.2,
-    jaarverbruikStroom: 2500,
-    jaarverbruikGas: 1000,
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm<EnergiecontractFormData>({
+    resolver: zodResolver(energiecontractSchema),
+    defaultValues: {
+      huidigStroomPrijs: 0.35,
+      huidigGasPrijs: 1.5,
+      nieuwStroomPrijs: 0.27,
+      nieuwGasPrijs: 1.2,
+      jaarverbruikStroom: 2500,
+      jaarverbruikGas: 1000,
+    },
+    mode: "onChange",
   });
+
+  const formValues = watch();
 
   const result = useMemo(() => {
     try {
+      const input: EnergiecontractInput = {
+        huidigStroomPrijs: formValues.huidigStroomPrijs,
+        huidigGasPrijs: formValues.huidigGasPrijs,
+        nieuwStroomPrijs: formValues.nieuwStroomPrijs,
+        nieuwGasPrijs: formValues.nieuwGasPrijs,
+        jaarverbruikStroom: formValues.jaarverbruikStroom,
+        jaarverbruikGas: formValues.jaarverbruikGas,
+        contractType: formValues.contractType,
+        vastrechtHuidig: formValues.vastrechtHuidig,
+        vastrechtNieuw: formValues.vastrechtNieuw,
+        netbeheerderKosten: formValues.netbeheerderKosten,
+        groeneStroom: formValues.groeneStroom,
+        prijsVerwachting: formValues.prijsVerwachting,
+      };
       return berekenEnergiecontract(input);
     } catch (error) {
       console.error("Calculation error:", error);
       return null;
     }
-  }, [input]);
+  }, [formValues]);
 
   return (
     <CalculatorLayout
@@ -39,26 +69,28 @@ export default function EnergiecontractCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Huidig contract</h2>
 
             <div className="space-y-5">
-              <InputField
+              <InputFieldRHF
                 label="Stroomprijs"
                 name="huidigStroomPrijs"
                 type="number"
-                value={input.huidigStroomPrijs}
-                onChange={(val) => setInput({ ...input, huidigStroomPrijs: Number(val) })}
+                register={register("huidigStroomPrijs", { valueAsNumber: true })}
+                error={errors.huidigStroomPrijs}
                 min={0}
                 step={0.01}
                 unit="€/kWh"
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Gasprijs"
                 name="huidigGasPrijs"
                 type="number"
-                value={input.huidigGasPrijs}
-                onChange={(val) => setInput({ ...input, huidigGasPrijs: Number(val) })}
+                register={register("huidigGasPrijs", { valueAsNumber: true })}
+                error={errors.huidigGasPrijs}
                 min={0}
                 step={0.01}
                 unit="€/m³"
+                required
               />
             </div>
           </div>
@@ -67,26 +99,28 @@ export default function EnergiecontractCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Nieuw contract</h2>
 
             <div className="space-y-5">
-              <InputField
+              <InputFieldRHF
                 label="Stroomprijs"
                 name="nieuwStroomPrijs"
                 type="number"
-                value={input.nieuwStroomPrijs}
-                onChange={(val) => setInput({ ...input, nieuwStroomPrijs: Number(val) })}
+                register={register("nieuwStroomPrijs", { valueAsNumber: true })}
+                error={errors.nieuwStroomPrijs}
                 min={0}
                 step={0.01}
                 unit="€/kWh"
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Gasprijs"
                 name="nieuwGasPrijs"
                 type="number"
-                value={input.nieuwGasPrijs}
-                onChange={(val) => setInput({ ...input, nieuwGasPrijs: Number(val) })}
+                register={register("nieuwGasPrijs", { valueAsNumber: true })}
+                error={errors.nieuwGasPrijs}
                 min={0}
                 step={0.01}
                 unit="€/m³"
+                required
               />
             </div>
           </div>
@@ -95,26 +129,28 @@ export default function EnergiecontractCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Verbruik</h2>
 
             <div className="space-y-5">
-              <InputField
+              <InputFieldRHF
                 label="Jaarverbruik stroom"
                 name="jaarverbruikStroom"
                 type="number"
-                value={input.jaarverbruikStroom}
-                onChange={(val) => setInput({ ...input, jaarverbruikStroom: Number(val) })}
+                register={register("jaarverbruikStroom", { valueAsNumber: true })}
+                error={errors.jaarverbruikStroom}
                 min={0}
                 step={100}
                 unit="kWh/jaar"
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Jaarverbruik gas"
                 name="jaarverbruikGas"
                 type="number"
-                value={input.jaarverbruikGas}
-                onChange={(val) => setInput({ ...input, jaarverbruikGas: Number(val) })}
+                register={register("jaarverbruikGas", { valueAsNumber: true })}
+                error={errors.jaarverbruikGas}
                 min={0}
                 step={100}
                 unit="m³/jaar"
+                required
               />
             </div>
           </div>

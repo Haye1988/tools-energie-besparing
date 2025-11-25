@@ -1,35 +1,65 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { berekenEnergielabel, EnergielabelInput } from "@/lib/calculations/energielabel";
+import { energielabelSchema, EnergielabelFormData } from "@/lib/validations/energielabel.schema";
 import CalculatorLayout from "@/components/shared/CalculatorLayout";
-import InputField from "@/components/shared/InputField";
-import SelectField from "@/components/shared/SelectField";
+import InputFieldRHF from "@/components/shared/InputFieldRHF";
+import SelectFieldRHF from "@/components/shared/SelectFieldRHF";
 import ResultCard from "@/components/shared/ResultCard";
 import LeadForm from "@/components/shared/LeadForm";
 
 export default function EnergielabelCalculator() {
-  const [input, setInput] = useState<EnergielabelInput>({
-    bouwjaar: 1980,
-    woningType: "tussenwoning",
-    oppervlakte: 120,
-    isolatieDak: "matig",
-    isolatieMuren: "matig",
-    isolatieVloer: "matig",
-    glasType: "dubbel",
-    verwarmingssysteem: "cv-ketel",
-    zonnepanelen: false,
-    zonnepaneelVermogen: 0,
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm<EnergielabelFormData>({
+    resolver: zodResolver(energielabelSchema),
+    defaultValues: {
+      bouwjaar: 1980,
+      woningType: "tussenwoning",
+      oppervlakte: 120,
+      isolatieDak: "matig",
+      isolatieMuren: "matig",
+      isolatieVloer: "matig",
+      glasType: "dubbel",
+      verwarmingssysteem: "cv-ketel",
+      zonnepanelen: false,
+      zonnepaneelVermogen: 0,
+    },
+    mode: "onChange",
   });
+
+  const formValues = watch();
 
   const result = useMemo(() => {
     try {
+      const input: EnergielabelInput = {
+        bouwjaar: formValues.bouwjaar,
+        woningType: formValues.woningType,
+        oppervlakte: formValues.oppervlakte,
+        isolatieDak: formValues.isolatieDak,
+        isolatieMuren: formValues.isolatieMuren,
+        isolatieVloer: formValues.isolatieVloer,
+        glasType: formValues.glasType,
+        verwarmingssysteem: formValues.verwarmingssysteem,
+        zonnepanelen: formValues.zonnepanelen,
+        zonnepaneelVermogen: formValues.zonnepaneelVermogen,
+        rcWaardeDak: formValues.rcWaardeDak,
+        rcWaardeMuren: formValues.rcWaardeMuren,
+        rcWaardeVloer: formValues.rcWaardeVloer,
+        verwarmingType: formValues.verwarmingType,
+        ventilatieType: formValues.ventilatieType,
+      };
       return berekenEnergielabel(input);
     } catch (error) {
       console.error("Calculation error:", error);
       return null;
     }
-  }, [input]);
+  }, [formValues]);
 
   return (
     <CalculatorLayout
@@ -44,22 +74,23 @@ export default function EnergielabelCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
 
             <div className="space-y-5">
-              <InputField
+              <InputFieldRHF
                 label="Bouwjaar"
                 name="bouwjaar"
                 type="number"
-                value={input.bouwjaar}
-                onChange={(val) => setInput({ ...input, bouwjaar: Number(val) })}
+                register={register("bouwjaar", { valueAsNumber: true })}
+                error={errors.bouwjaar}
                 min={1900}
                 max={2025}
                 step={1}
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Woningtype"
                 name="woningType"
-                value={input.woningType}
-                onChange={(val) => setInput({ ...input, woningType: val as any })}
+                register={register("woningType")}
+                error={errors.woningType}
                 options={[
                   { value: "appartement", label: "Appartement" },
                   { value: "tussenwoning", label: "Tussenwoning" },
@@ -67,85 +98,91 @@ export default function EnergielabelCalculator() {
                   { value: "2-onder-1-kap", label: "2-onder-1-kap" },
                   { value: "vrijstaand", label: "Vrijstaand" },
                 ]}
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Oppervlakte"
                 name="oppervlakte"
                 type="number"
-                value={input.oppervlakte}
-                onChange={(val) => setInput({ ...input, oppervlakte: Number(val) })}
+                register={register("oppervlakte", { valueAsNumber: true })}
+                error={errors.oppervlakte}
                 min={0}
                 step={10}
                 unit="m²"
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Isolatie dak"
                 name="isolatieDak"
-                value={input.isolatieDak}
-                onChange={(val) => setInput({ ...input, isolatieDak: val as any })}
+                register={register("isolatieDak")}
+                error={errors.isolatieDak}
                 options={[
                   { value: "geen", label: "Geen isolatie" },
                   { value: "matig", label: "Matig" },
                   { value: "goed", label: "Goed" },
                 ]}
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Isolatie muren"
                 name="isolatieMuren"
-                value={input.isolatieMuren}
-                onChange={(val) => setInput({ ...input, isolatieMuren: val as any })}
+                register={register("isolatieMuren")}
+                error={errors.isolatieMuren}
                 options={[
                   { value: "geen", label: "Geen isolatie" },
                   { value: "matig", label: "Matig" },
                   { value: "goed", label: "Goed" },
                 ]}
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Isolatie vloer"
                 name="isolatieVloer"
-                value={input.isolatieVloer}
-                onChange={(val) => setInput({ ...input, isolatieVloer: val as any })}
+                register={register("isolatieVloer")}
+                error={errors.isolatieVloer}
                 options={[
                   { value: "geen", label: "Geen isolatie" },
                   { value: "matig", label: "Matig" },
                   { value: "goed", label: "Goed" },
                 ]}
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Glastype"
                 name="glasType"
-                value={input.glasType}
-                onChange={(val) => setInput({ ...input, glasType: val as any })}
+                register={register("glasType")}
+                error={errors.glasType}
                 options={[
                   { value: "enkel", label: "Enkel glas" },
                   { value: "dubbel", label: "Dubbel glas" },
                   { value: "hr", label: "HR glas" },
                 ]}
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Verwarmingssysteem"
                 name="verwarmingssysteem"
-                value={input.verwarmingssysteem}
-                onChange={(val) => setInput({ ...input, verwarmingssysteem: val as any })}
+                register={register("verwarmingssysteem")}
+                error={errors.verwarmingssysteem}
                 options={[
                   { value: "cv-ketel", label: "CV-ketel" },
                   { value: "warmtepomp", label: "Warmtepomp" },
                   { value: "hybride", label: "Hybride" },
                 ]}
+                required
               />
 
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   id="zonnepanelen"
-                  checked={input.zonnepanelen}
-                  onChange={(e) => setInput({ ...input, zonnepanelen: e.target.checked })}
+                  {...register("zonnepanelen")}
                   className="w-4 h-4"
                 />
                 <label htmlFor="zonnepanelen" className="text-sm text-gray-700">
@@ -153,16 +190,17 @@ export default function EnergielabelCalculator() {
                 </label>
               </div>
 
-              {input.zonnepanelen && (
-                <InputField
+              {formValues.zonnepanelen && (
+                <InputFieldRHF
                   label="Zonnepaneel vermogen"
                   name="zonnepaneelVermogen"
                   type="number"
-                  value={input.zonnepaneelVermogen ?? 0}
-                  onChange={(val) => setInput({ ...input, zonnepaneelVermogen: Number(val) })}
+                  register={register("zonnepaneelVermogen", { valueAsNumber: true })}
+                  error={errors.zonnepaneelVermogen}
                   min={0}
                   step={0.5}
                   unit="kWp"
+                  defaultValue={0}
                 />
               )}
             </div>

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ToolName } from "@/types/calculator";
+import { trackEvent } from "@/lib/analytics/posthog";
 import { suggestedQuestions } from "@/lib/ai/openrouter";
 
 interface AIChatProps {
@@ -20,6 +21,12 @@ export default function AIChat({ tool, context, className }: AIChatProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      trackEvent("ai_chat_opened", { tool });
+    }
+  }, [isOpen, tool]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +53,11 @@ export default function AIChat({ tool, context, className }: AIChatProps) {
         const data = await response.json();
         const assistantMessage: Message = { role: "assistant", content: data.answer };
         setMessages((prev) => [...prev, assistantMessage]);
+        trackEvent("ai_chat_message_sent", {
+          tool,
+          messageCount: messages.length + 1,
+          hasContext: Object.keys(context).length > 0,
+        });
       } else {
         throw new Error("Failed to get AI response");
       }

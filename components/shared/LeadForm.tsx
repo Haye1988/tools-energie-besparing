@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ToolName } from "@/types/calculator";
+import { trackEvent } from "@/lib/analytics/posthog";
 import InputField from "./InputField";
 
 interface LeadFormProps {
@@ -43,9 +44,18 @@ export default function LeadForm({ tool, results, onSuccess, className }: LeadFo
         setEmail("");
         setPostcode("");
         setAdditionalInfo("");
+        trackEvent("lead_form_submitted", {
+          tool,
+          hasResults: !!results,
+          hasAdditionalInfo: !!additionalInfo,
+        });
         onSuccess?.();
       } else {
         setSubmitStatus("error");
+        trackEvent("lead_form_error", {
+          tool,
+          error: "submission_failed",
+        });
       }
     } catch (error) {
       console.error("Error submitting lead:", error);

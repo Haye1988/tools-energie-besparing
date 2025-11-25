@@ -1,31 +1,54 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { berekenKozijnen, KozijnenInput } from "@/lib/calculations/kozijnen";
+import { kozijnenSchema, KozijnenFormData } from "@/lib/validations/kozijnen.schema";
 import CalculatorLayout from "@/components/shared/CalculatorLayout";
-import InputField from "@/components/shared/InputField";
-import SelectField from "@/components/shared/SelectField";
+import InputFieldRHF from "@/components/shared/InputFieldRHF";
+import SelectFieldRHF from "@/components/shared/SelectFieldRHF";
 import ResultCard from "@/components/shared/ResultCard";
 import LeadForm from "@/components/shared/LeadForm";
 
 export default function KozijnenCalculator() {
-  const [input, setInput] = useState<KozijnenInput>({
-    oppervlakteRamen: 20,
-    huidigGlasType: "dubbel",
-    kozijnMateriaal: "kunststof",
-    gasVerbruik: 1200,
-    gasPrijs: 1.2,
-    woningType: "tussenwoning",
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm<KozijnenFormData>({
+    resolver: zodResolver(kozijnenSchema),
+    defaultValues: {
+      oppervlakteRamen: 20,
+      huidigGlasType: "dubbel",
+      kozijnMateriaal: "kunststof",
+      gasVerbruik: 1200,
+      gasPrijs: 1.2,
+      woningType: "tussenwoning",
+    },
+    mode: "onChange",
   });
+
+  const formValues = watch();
 
   const result = useMemo(() => {
     try {
+      const input: KozijnenInput = {
+        oppervlakteRamen: formValues.oppervlakteRamen,
+        huidigGlasType: formValues.huidigGlasType,
+        kozijnMateriaal: formValues.kozijnMateriaal,
+        gasVerbruik: formValues.gasVerbruik,
+        gasPrijs: formValues.gasPrijs,
+        woningType: formValues.woningType,
+        bouwjaar: formValues.bouwjaar,
+        investeringsKosten: formValues.investeringsKosten,
+      };
       return berekenKozijnen(input);
     } catch (error) {
       console.error("Calculation error:", error);
       return null;
     }
-  }, [input]);
+  }, [formValues]);
 
   return (
     <CalculatorLayout
@@ -40,22 +63,23 @@ export default function KozijnenCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
 
             <div className="space-y-5">
-              <InputField
+              <InputFieldRHF
                 label="Oppervlakte ramen"
                 name="oppervlakteRamen"
                 type="number"
-                value={input.oppervlakteRamen}
-                onChange={(val) => setInput({ ...input, oppervlakteRamen: Number(val) })}
+                register={register("oppervlakteRamen", { valueAsNumber: true })}
+                error={errors.oppervlakteRamen}
                 min={0}
                 step={1}
                 unit="m²"
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Woningtype"
                 name="woningType"
-                value={input.woningType || "tussenwoning"}
-                onChange={(val) => setInput({ ...input, woningType: val as any })}
+                register={register("woningType")}
+                error={errors.woningType}
                 options={[
                   { value: "appartement", label: "Appartement" },
                   { value: "tussenwoning", label: "Tussenwoning" },
@@ -63,14 +87,15 @@ export default function KozijnenCalculator() {
                   { value: "2-onder-1-kap", label: "2-onder-1-kap" },
                   { value: "vrijstaand", label: "Vrijstaand" },
                 ]}
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Bouwjaar (optioneel)"
                 name="bouwjaar"
                 type="number"
-                value={input.bouwjaar || ""}
-                onChange={(val) => setInput({ ...input, bouwjaar: val ? Number(val) : undefined })}
+                register={register("bouwjaar", { valueAsNumber: true })}
+                error={errors.bouwjaar}
                 min={1900}
                 max={new Date().getFullYear()}
                 step={1}
@@ -78,64 +103,66 @@ export default function KozijnenCalculator() {
                 helpText="Voor automatische bepaling huidig glastype"
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Huidig glastype"
                 name="huidigGlasType"
-                value={input.huidigGlasType || "dubbel"}
-                onChange={(val) => setInput({ ...input, huidigGlasType: val as any })}
+                register={register("huidigGlasType")}
+                error={errors.huidigGlasType}
                 options={[
                   { value: "enkel", label: "Enkel glas" },
                   { value: "dubbel", label: "Dubbel glas" },
                   { value: "hr", label: "HR glas" },
                 ]}
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Kozijn materiaal"
                 name="kozijnMateriaal"
-                value={input.kozijnMateriaal}
-                onChange={(val) => setInput({ ...input, kozijnMateriaal: val as any })}
+                register={register("kozijnMateriaal")}
+                error={errors.kozijnMateriaal}
                 options={[
                   { value: "hout", label: "Hout" },
                   { value: "kunststof", label: "Kunststof" },
                   { value: "aluminium", label: "Aluminium" },
                 ]}
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Jaarlijks gasverbruik"
                 name="gasVerbruik"
                 type="number"
-                value={input.gasVerbruik}
-                onChange={(val) => setInput({ ...input, gasVerbruik: Number(val) })}
+                register={register("gasVerbruik", { valueAsNumber: true })}
+                error={errors.gasVerbruik}
                 min={0}
                 step={100}
                 unit="m³/jaar"
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Gasprijs"
                 name="gasPrijs"
                 type="number"
-                value={input.gasPrijs ?? 1.2}
-                onChange={(val) => setInput({ ...input, gasPrijs: Number(val) })}
+                register={register("gasPrijs", { valueAsNumber: true })}
+                error={errors.gasPrijs}
                 min={0}
                 step={0.01}
                 unit="€/m³"
+                defaultValue={1.2}
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Investeringskosten (optioneel)"
                 name="investeringsKosten"
                 type="number"
-                value={input.investeringsKosten || ""}
-                onChange={(val) =>
-                  setInput({ ...input, investeringsKosten: val ? Number(val) : undefined })
-                }
+                register={register("investeringsKosten", { valueAsNumber: true })}
+                error={errors.investeringsKosten}
                 min={0}
                 step={100}
                 unit="€"
-                helpText={`Geschat: €${Math.round((input.oppervlakteRamen || 20) * 225).toLocaleString("nl-NL")} (€150-300 per m²)`}
+                helpText={`Geschat: €${Math.round((formValues.oppervlakteRamen || 20) * 225).toLocaleString("nl-NL")} (€150-300 per m²)`}
               />
             </div>
           </div>

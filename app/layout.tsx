@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { StrictMode } from "react";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
+import PostHogProvider from "@/components/shared/PostHogProvider";
 import "./globals.css";
 import "../sentry.client.config";
 
@@ -18,10 +20,17 @@ export default function RootLayout({
   return (
     <html lang="nl">
       <body>
-        <ErrorBoundary>
-          {process.env.NODE_ENV === "development" ? <StrictMode>{children}</StrictMode> : children}
-        </ErrorBoundary>
+        <PostHogProvider>
+          <ErrorBoundary>
+            {process.env.NODE_ENV === "development" ? (
+              <StrictMode>{children}</StrictMode>
+            ) : (
+              children
+            )}
+          </ErrorBoundary>
+        </PostHogProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

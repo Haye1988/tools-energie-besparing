@@ -1,31 +1,56 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { berekenAirco, AircoInput } from "@/lib/calculations/airco";
+import { aircoSchema, AircoFormData } from "@/lib/validations/airco.schema";
 import CalculatorLayout from "@/components/shared/CalculatorLayout";
-import InputField from "@/components/shared/InputField";
-import SelectField from "@/components/shared/SelectField";
+import InputFieldRHF from "@/components/shared/InputFieldRHF";
+import SelectFieldRHF from "@/components/shared/SelectFieldRHF";
 import ResultCard from "@/components/shared/ResultCard";
 import LeadForm from "@/components/shared/LeadForm";
 
 export default function AircoCalculator() {
-  const [input, setInput] = useState<AircoInput>({
-    oppervlakte: 25,
-    hoogte: 2.5,
-    isolatieNiveau: "gemiddeld",
-    toepassing: "koelen",
-    koelurenPerJaar: 720,
-    stroomPrijs: 0.27,
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm<AircoFormData>({
+    resolver: zodResolver(aircoSchema),
+    defaultValues: {
+      oppervlakte: 25,
+      hoogte: 2.5,
+      isolatieNiveau: "gemiddeld",
+      toepassing: "koelen",
+      koelurenPerJaar: 720,
+      stroomPrijs: 0.27,
+    },
+    mode: "onChange",
   });
+
+  const formValues = watch();
 
   const result = useMemo(() => {
     try {
+      const input: AircoInput = {
+        oppervlakte: formValues.oppervlakte,
+        hoogte: formValues.hoogte,
+        isolatieNiveau: formValues.isolatieNiveau,
+        toepassing: formValues.toepassing,
+        koelurenPerJaar: formValues.koelurenPerJaar,
+        stroomPrijs: formValues.stroomPrijs,
+        aantalPersonen: formValues.aantalPersonen,
+        raamOppervlak: formValues.raamOppervlak,
+        zonInstraling: formValues.zonInstraling,
+        aantalRuimtes: formValues.aantalRuimtes,
+      };
       return berekenAirco(input);
     } catch (error) {
       console.error("Calculation error:", error);
       return null;
     }
-  }, [input]);
+  }, [formValues]);
 
   return (
     <CalculatorLayout
@@ -40,72 +65,78 @@ export default function AircoCalculator() {
             <h2 className="text-2xl font-bold text-totaaladvies-blue mb-6">Jouw gegevens</h2>
 
             <div className="space-y-5">
-              <InputField
+              <InputFieldRHF
                 label="Oppervlakte ruimte"
                 name="oppervlakte"
                 type="number"
-                value={input.oppervlakte}
-                onChange={(val) => setInput({ ...input, oppervlakte: Number(val) })}
+                register={register("oppervlakte", { valueAsNumber: true })}
+                error={errors.oppervlakte}
                 min={0}
                 step={1}
                 unit="m²"
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Plafondhoogte"
                 name="hoogte"
                 type="number"
-                value={input.hoogte}
-                onChange={(val) => setInput({ ...input, hoogte: Number(val) })}
+                register={register("hoogte", { valueAsNumber: true })}
+                error={errors.hoogte}
                 min={2}
                 max={5}
                 step={0.1}
                 unit="m"
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Isolatieniveau"
                 name="isolatieNiveau"
-                value={input.isolatieNiveau}
-                onChange={(val) => setInput({ ...input, isolatieNiveau: val as any })}
+                register={register("isolatieNiveau")}
+                error={errors.isolatieNiveau}
                 options={[
                   { value: "goed", label: "Goed geïsoleerd" },
                   { value: "gemiddeld", label: "Gemiddeld" },
                   { value: "slecht", label: "Slecht geïsoleerd / veel ramen" },
                 ]}
+                required
               />
 
-              <SelectField
+              <SelectFieldRHF
                 label="Toepassing"
                 name="toepassing"
-                value={input.toepassing}
-                onChange={(val) => setInput({ ...input, toepassing: val as any })}
+                register={register("toepassing")}
+                error={errors.toepassing}
                 options={[
                   { value: "koelen", label: "Alleen koelen" },
                   { value: "koelen-verwarmen", label: "Koelen + verwarmen" },
                 ]}
+                required
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Koeluren per jaar"
                 name="koelurenPerJaar"
                 type="number"
-                value={input.koelurenPerJaar ?? 720}
-                onChange={(val) => setInput({ ...input, koelurenPerJaar: Number(val) })}
+                register={register("koelurenPerJaar", { valueAsNumber: true })}
+                error={errors.koelurenPerJaar}
                 min={0}
                 step={100}
                 unit="uren"
+                defaultValue={720}
               />
 
-              <InputField
+              <InputFieldRHF
                 label="Stroomprijs"
                 name="stroomPrijs"
                 type="number"
-                value={input.stroomPrijs ?? 0.27}
-                onChange={(val) => setInput({ ...input, stroomPrijs: Number(val) })}
+                register={register("stroomPrijs", { valueAsNumber: true })}
+                error={errors.stroomPrijs}
                 min={0}
                 step={0.01}
                 unit="€/kWh"
+                defaultValue={0.27}
               />
             </div>
           </div>
