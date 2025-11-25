@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ToolName } from "@/types/calculator";
+import { suggestedQuestions } from "@/lib/ai/openrouter";
 
 interface AIChatProps {
   tool: ToolName;
@@ -103,8 +104,57 @@ export default function AIChat({ tool, context, className }: AIChatProps) {
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         {messages.length === 0 && (
-          <div className="text-center text-totaaladvies-gray-medium text-sm py-8">
-            <p>Stel een vraag over je berekening!</p>
+          <div className="space-y-4">
+            <div className="text-center text-totaaladvies-gray-medium text-sm py-4">
+              <p className="font-medium mb-3">Stel een vraag over je berekening!</p>
+              <p className="text-xs mb-4">Of kies een voorbeeldvraag:</p>
+            </div>
+            <div className="space-y-2">
+              {suggestedQuestions[tool]?.slice(0, 3).map((question, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={async () => {
+                    const userMessage: Message = { role: "user", content: question };
+                    setMessages([userMessage]);
+                    setIsLoading(true);
+
+                    try {
+                      const response = await fetch(`/api/ai/${tool}`, {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                          question: userMessage.content,
+                          context,
+                        }),
+                      });
+
+                      if (response.ok) {
+                        const data = await response.json();
+                        const assistantMessage: Message = { role: "assistant", content: data.answer };
+                        setMessages([userMessage, assistantMessage]);
+                      } else {
+                        throw new Error("Failed to get AI response");
+                      }
+                    } catch (error) {
+                      console.error("Error getting AI response:", error);
+                      const errorMessage: Message = {
+                        role: "assistant",
+                        content: "Sorry, er ging iets mis. Probeer het later opnieuw.",
+                      };
+                      setMessages([userMessage, errorMessage]);
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                  className="w-full text-left px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg hover:border-totaaladvies-orange hover:bg-orange-50 transition-colors text-gray-700"
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
           </div>
         )}
         {messages.map((message, idx) => (

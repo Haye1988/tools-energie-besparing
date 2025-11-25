@@ -15,6 +15,7 @@ export default function KozijnenCalculator() {
     kozijnMateriaal: "kunststof",
     gasVerbruik: 1200,
     gasPrijs: 1.2,
+    woningType: "tussenwoning",
   });
 
   const result = useMemo(() => {
@@ -51,9 +52,36 @@ export default function KozijnenCalculator() {
               />
 
               <SelectField
+                label="Woningtype"
+                name="woningType"
+                value={input.woningType || "tussenwoning"}
+                onChange={(val) => setInput({ ...input, woningType: val as any })}
+                options={[
+                  { value: "appartement", label: "Appartement" },
+                  { value: "tussenwoning", label: "Tussenwoning" },
+                  { value: "hoekwoning", label: "Hoekwoning" },
+                  { value: "2-onder-1-kap", label: "2-onder-1-kap" },
+                  { value: "vrijstaand", label: "Vrijstaand" },
+                ]}
+              />
+
+              <InputField
+                label="Bouwjaar (optioneel)"
+                name="bouwjaar"
+                type="number"
+                value={input.bouwjaar || ""}
+                onChange={(val) => setInput({ ...input, bouwjaar: val ? Number(val) : undefined })}
+                min={1900}
+                max={new Date().getFullYear()}
+                step={1}
+                unit=""
+                helpText="Voor automatische bepaling huidig glastype"
+              />
+
+              <SelectField
                 label="Huidig glastype"
                 name="huidigGlasType"
-                value={input.huidigGlasType}
+                value={input.huidigGlasType || "dubbel"}
                 onChange={(val) => setInput({ ...input, huidigGlasType: val as any })}
                 options={[
                   { value: "enkel", label: "Enkel glas" },
@@ -94,6 +122,18 @@ export default function KozijnenCalculator() {
                 min={0}
                 step={0.01}
                 unit="€/m³"
+              />
+
+              <InputField
+                label="Investeringskosten (optioneel)"
+                name="investeringsKosten"
+                type="number"
+                value={input.investeringsKosten || ""}
+                onChange={(val) => setInput({ ...input, investeringsKosten: val ? Number(val) : undefined })}
+                min={0}
+                step={100}
+                unit="€"
+                helpText={`Geschat: €${Math.round((input.oppervlakteRamen || 20) * 225).toLocaleString("nl-NL")} (€150-300 per m²)`}
               />
             </div>
           </div>
@@ -138,6 +178,20 @@ export default function KozijnenCalculator() {
                   variant="info"
                 />
               </div>
+
+              {result.investeringsKosten && (
+                <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Investeringskosten</h3>
+                  <p className="text-2xl font-bold text-totaaladvies-blue">
+                    €{result.investeringsKosten.toLocaleString("nl-NL")}
+                  </p>
+                  {result.terugverdientijd && (
+                    <p className="text-sm text-gray-600 mt-2">
+                      Terugverdientijd: {result.terugverdientijd} jaar
+                    </p>
+                  )}
+                </div>
+              )}
 
               <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Comfort verbetering</h3>

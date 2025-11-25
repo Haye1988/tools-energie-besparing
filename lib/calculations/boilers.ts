@@ -4,6 +4,25 @@ export interface BoilersInput {
   huidigSysteem: "cv-boiler" | "elektrisch" | "geen";
   stroomPrijs?: number; // €/kWh
   gasPrijs?: number; // €/m³
+  doucheMinutenPerDag?: number; // minuten, default 8
+  aantalBadenPerWeek?: number; // default 0
+  boilerLocatie?: "binnen" | "buiten" | "ventilatielucht";
+  investeringsKosten?: number; // € (optioneel)
+}
+
+export interface VergelijkingSystemen {
+  elektrisch: {
+    verbruik: number; // kWh/jaar
+    kosten: number; // €/jaar
+  };
+  cv: {
+    verbruik: number; // m³/jaar
+    kosten: number; // €/jaar
+  };
+  warmtepomp: {
+    verbruik: number; // kWh/jaar
+    kosten: number; // €/jaar
+  };
 }
 
 export interface BoilersResult {
@@ -13,14 +32,24 @@ export interface BoilersResult {
   jaarlijksVerbruik: number; // kWh of m³
   jaarlijkseKosten: number; // €
   besparingVsCv?: number; // €/jaar
+  vergelijkingSystemen?: VergelijkingSystemen;
+  terugverdientijd?: number; // jaren
+  legionellaVerbruik?: number; // kWh/jaar voor bijverwarmen
   advies: string;
 }
 
-// Warmwater behoefte per persoon (liter/dag)
+// Warmwater behoefte per persoon (liter/dag) - verfijnd naar ~40 L
 const warmwaterBehoeftePerPersoon: Record<string, number> = {
   laag: 30,
-  gemiddeld: 50,
-  hoog: 70,
+  gemiddeld: 40, // Verfijnd van 50 naar 40
+  hoog: 60, // Verfijnd van 70 naar 60
+};
+
+// SCOP (Seizoensgebonden COP) per locatie
+const scopWaarden: Record<string, number> = {
+  binnen: 3.5, // Binnen: hoogste rendement
+  ventilatielucht: 3.0, // Ventilatielucht: goed rendement
+  buiten: 2.5, // Buiten: lager rendement (kouder)
 };
 
 // Volume advies (liter) per aantal personen
@@ -38,13 +67,28 @@ export function berekenBoilers(input: BoilersInput): BoilersResult {
     huidigSysteem,
     stroomPrijs = 0.27,
     gasPrijs = 1.2,
+    doucheMinutenPerDag = 8,
+    aantalBadenPerWeek = 0,
+    boilerLocatie = "binnen",
+    investeringsKosten,
   } = input;
 
   // Normaliseer warmwater behoefte
   const warmwaterBehoefteValue = warmwaterBehoefte ?? "gemiddeld";
 
+  // Bereken warmwater verbruik op basis van douchegewoonten
+  // Douche: ~7 L/min, bad: ~150 L
+  const doucheVerbruikPerDag = (doucheMinutenPerDag * 7 * aantalPersonen) / 1000; // m³
+  const badVerbruikPerDag = (aantalBadenPerWeek * 150 * aantalPersonen) / (7 * 1000); // m³
+  const totaalVerbruikPerDag = doucheVerbruikPerDag + badVerbruikPerDag + (aantalPersonen * 5) / 1000; // +5L per persoon voor keuken
+  const literPerDag = totaalVerbruikPerDag * 1000;
+
+  // Gebruik berekend verbruik of standaard waarde
+  const literPerPersoonPerDag = literPerDag / aantalPersonen;
+  const gebruikteBehoefte = literPerPersoonPerDag > 0 ? literPerPersoonPerDag : (warmwaterBehoeftePerPersoon[warmwaterBehoefteValue] || 40);
+
   // Aanbevolen volume
-  const aanbevolenVolume = getVolumeAdvies(aantalPersonen, warmwaterBehoefteValue);
+  const aanbevolenVolume = Math.ceil((aantalPersonen * gebruikteBehoefte * 1.5));
 
   // Vermogen advies (kW) - voor opwarmen in redelijke tijd
   // Aanname: 100 liter opwarmen van 10°C naar 60°C in 1 uur ≈ 5.8 kW
@@ -55,30 +99,64 @@ export function berekenBoilers(input: BoilersInput): BoilersResult {
   // Anders: elektrisch
   const typeAdvies =
     aantalPersonen >= 4 || warmwaterBehoefteValue === "hoog" ? "warmtepomp" : "elektrisch";
-  const literPerJaar =
-    aantalPersonen * (warmwaterBehoeftePerPersoon[warmwaterBehoefteValue] || 50) * 365;
+  const literPerJaar = aantalPersonen * gebruikteBehoefte * 365;
   const energiePerJaar_kWh = (literPerJaar * 4.186 * 50) / 3600; // 50°C temperatuurverschil
+
+  // SCOP voor warmtepompboiler
+  const scop = scopWaarden[boilerLocatie] || 3.0;
+
+  // Vergelijking systemen
+  // Elektrische boiler
+  const elektrischVerbruik = energiePerJaar_kWh;
+  const elektrischKosten = elektrischVerbruik * stroomPrijs;
+
+  // CV-boiler
+  const cvVerbruik_m3 = energiePerJaar_kWh / 9.5;
+  const cvKosten = cvVerbruik_m3 * gasPrijs;
+
+  // Warmtepompboiler
+  const warmtepompVerbruik = energiePerJaar_kWh / scop;
+  // Legionella bijverwarmen: 1x per week tot 60°C, ~2 kWh per keer
+  const legionellaVerbruik = 2 * 52; // 52 weken
+  const totaalWarmtepompVerbruik = warmtepompVerbruik + legionellaVerbruik;
+  const warmtepompKosten = totaalWarmtepompVerbruik * stroomPrijs;
+
+  const vergelijkingSystemen: VergelijkingSystemen = {
+    elektrisch: {
+      verbruik: Math.round(elektrischVerbruik),
+      kosten: Math.round(elektrischKosten * 100) / 100,
+    },
+    cv: {
+      verbruik: Math.round(cvVerbruik_m3),
+      kosten: Math.round(cvKosten * 100) / 100,
+    },
+    warmtepomp: {
+      verbruik: Math.round(totaalWarmtepompVerbruik),
+      kosten: Math.round(warmtepompKosten * 100) / 100,
+    },
+  };
 
   let jaarlijksVerbruik: number;
   let jaarlijkseKosten: number;
 
   if (typeAdvies === "warmtepomp") {
-    // Warmtepompboiler: COP ~3, dus 1/3 van energie
-    jaarlijksVerbruik = energiePerJaar_kWh / 3;
-    jaarlijkseKosten = jaarlijksVerbruik * stroomPrijs;
+    jaarlijksVerbruik = totaalWarmtepompVerbruik;
+    jaarlijkseKosten = warmtepompKosten;
   } else {
-    // Elektrische boiler: direct verbruik
-    jaarlijksVerbruik = energiePerJaar_kWh;
-    jaarlijkseKosten = jaarlijksVerbruik * stroomPrijs;
+    jaarlijksVerbruik = elektrischVerbruik;
+    jaarlijkseKosten = elektrischKosten;
   }
 
   // Besparing vs CV-boiler
   let besparingVsCv: number | undefined;
   if (huidigSysteem === "cv-boiler") {
-    // CV-boiler verbruikt gas: 1 m³ ≈ 9.5 kWh
-    const cvVerbruik_m3 = energiePerJaar_kWh / 9.5;
-    const cvKosten = cvVerbruik_m3 * gasPrijs;
     besparingVsCv = cvKosten - jaarlijkseKosten;
+  }
+
+  // Terugverdientijd (indien investeringskosten bekend)
+  let terugverdientijd: number | undefined;
+  if (investeringsKosten && investeringsKosten > 0 && besparingVsCv && besparingVsCv > 0) {
+    terugverdientijd = investeringsKosten / besparingVsCv;
   }
 
   // Advies tekst
@@ -97,6 +175,9 @@ export function berekenBoilers(input: BoilersInput): BoilersResult {
     jaarlijksVerbruik: Math.round(jaarlijksVerbruik),
     jaarlijkseKosten: Math.round(jaarlijkseKosten * 100) / 100,
     besparingVsCv: besparingVsCv ? Math.round(besparingVsCv * 100) / 100 : undefined,
+    vergelijkingSystemen,
+    terugverdientijd: terugverdientijd ? Math.round(terugverdientijd * 10) / 10 : undefined,
+    legionellaVerbruik: Math.round(legionellaVerbruik),
     advies,
   };
 }

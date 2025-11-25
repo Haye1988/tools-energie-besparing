@@ -7,6 +7,8 @@ export interface ThuisbatterijInput {
   salderingActief?: boolean; // default true
   stroomPrijs?: number; // €/kWh
   terugleverVergoeding?: number; // €/kWh (default 0.08)
+  gemiddeldDagelijksVerbruik?: number; // kWh (optioneel, anders berekend)
+  investeringsKosten?: number; // € (optioneel, voor terugverdientijd)
 }
 
 export interface ThuisbatterijResult {
@@ -16,6 +18,9 @@ export interface ThuisbatterijResult {
   eigenVerbruikZonder: number; // %
   eigenVerbruikMet: number; // %
   jaarlijkseBesparing: number; // €
+  besparingMetSaldering?: number; // €/jaar
+  besparingZonderSaldering?: number; // €/jaar
+  terugverdientijd?: number; // jaren
   advies: string;
 }
 
@@ -32,6 +37,8 @@ export function berekenThuisbatterij(input: ThuisbatterijInput): ThuisbatterijRe
     salderingActief = true,
     stroomPrijs = 0.27,
     terugleverVergoeding = 0.08,
+    gemiddeldDagelijksVerbruik,
+    investeringsKosten,
   } = input;
 
   // Jaarlijkse opwekking (als niet opgegeven)
@@ -65,18 +72,22 @@ export function berekenThuisbatterij(input: ThuisbatterijInput): ThuisbatterijRe
   const eigenVerbruikPercentageMet = (eigenVerbruikMet / opwekking) * 100;
 
   // Financiële besparing
-  let jaarlijkseBesparing = 0;
+  const extraZelfverbruik = eigenVerbruikMet - eigenVerbruikZonder;
 
-  if (!salderingActief) {
-    // Extra zelfverbruik door batterij
-    const extraZelfverbruik = eigenVerbruikMet - eigenVerbruikZonder;
-    // Besparing = verschil tussen stroomprijs en terugleververgoeding
-    jaarlijkseBesparing = extraZelfverbruik * (stroomPrijs - terugleverVergoeding);
-  } else {
-    // Met saldering is besparing beperkt (alleen terugleverkosten)
-    const terugleverkosten = 0.13; // €/kWh
-    const extraZelfverbruik = eigenVerbruikMet - eigenVerbruikZonder;
-    jaarlijkseBesparing = extraZelfverbruik * terugleverkosten;
+  // Besparing met saldering (beperkt, alleen terugleverkosten)
+  const terugleverkosten = 0.13; // €/kWh
+  const besparingMetSaldering = extraZelfverbruik * terugleverkosten;
+
+  // Besparing zonder saldering (verschil tussen stroomprijs en terugleververgoeding)
+  const besparingZonderSaldering = extraZelfverbruik * (stroomPrijs - terugleverVergoeding);
+
+  // Standaard besparing (afhankelijk van saldering status)
+  const jaarlijkseBesparing = salderingActief ? besparingMetSaldering : besparingZonderSaldering;
+
+  // Terugverdientijd (indien investeringskosten bekend)
+  let terugverdientijd: number | undefined;
+  if (investeringsKosten && investeringsKosten > 0 && jaarlijkseBesparing > 0) {
+    terugverdientijd = investeringsKosten / jaarlijkseBesparing;
   }
 
   // Advies tekst
@@ -95,6 +106,9 @@ export function berekenThuisbatterij(input: ThuisbatterijInput): ThuisbatterijRe
     eigenVerbruikZonder: Math.round(eigenVerbruikPercentageZonder * 10) / 10,
     eigenVerbruikMet: Math.round(eigenVerbruikPercentageMet * 10) / 10,
     jaarlijkseBesparing: Math.round(jaarlijkseBesparing * 100) / 100,
+    besparingMetSaldering: Math.round(besparingMetSaldering * 100) / 100,
+    besparingZonderSaldering: Math.round(besparingZonderSaldering * 100) / 100,
+    terugverdientijd: terugverdientijd ? Math.round(terugverdientijd * 10) / 10 : undefined,
     advies,
   };
 }

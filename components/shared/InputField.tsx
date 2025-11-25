@@ -15,6 +15,7 @@ interface InputFieldProps {
   unit?: string;
   required?: boolean;
   className?: string;
+  helpText?: string;
 }
 
 export default function InputField({
@@ -30,6 +31,7 @@ export default function InputField({
   unit,
   required = false,
   className,
+  helpText,
 }: InputFieldProps) {
   return (
     <div className={cn("space-y-2", className)}>
@@ -60,6 +62,9 @@ export default function InputField({
           </span>
         )}
       </div>
+      {helpText && (
+        <p className="text-xs text-totaaladvies-gray-medium">{helpText}</p>
+      )}
     </div>
   );
 }

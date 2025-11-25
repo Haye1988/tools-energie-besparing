@@ -16,6 +16,7 @@ export default function WarmtepompCalculator() {
     warmtepompType: "hybride",
     gasPrijs: 1.2,
     stroomPrijs: 0.27,
+    cop: 4,
   });
 
   const result = useMemo(() => {
@@ -109,6 +110,31 @@ export default function WarmtepompCalculator() {
                 step={0.01}
                 unit="€/kWh"
               />
+
+              <InputField
+                label="COP (Coefficient of Performance)"
+                name="cop"
+                type="number"
+                value={input.cop || 4}
+                onChange={(val) => setInput({ ...input, cop: Number(val) })}
+                min={3}
+                max={5}
+                step={0.1}
+                unit=""
+                helpText="Moderne warmtepompen hebben een COP van 3-5. Standaard: 4"
+              />
+
+              <InputField
+                label="Installatiekosten (optioneel)"
+                name="installatieKosten"
+                type="number"
+                value={input.installatieKosten || ""}
+                onChange={(val) => setInput({ ...input, installatieKosten: val ? Number(val) : undefined })}
+                min={0}
+                step={1000}
+                unit="€"
+                helpText="Voor berekening terugverdientijd"
+              />
             </div>
           </div>
         </div>
@@ -179,8 +205,76 @@ export default function WarmtepompCalculator() {
                     <strong>Gasbesparing:</strong> {result.gasBesparing} m³/jaar (
                     {result.co2Reductie} kg CO₂ minder)
                   </p>
+                  {result.terugverdientijd && (
+                    <p>
+                      <strong>Terugverdientijd:</strong> {result.terugverdientijd} jaar
+                    </p>
+                  )}
                 </div>
               </div>
+
+              {result.scenarioRange && (
+                <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Scenario's</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Vermogen (kW)</h4>
+                      <div className="grid grid-cols-3 gap-2 text-sm">
+                        <div className="bg-green-50 p-3 rounded">
+                          <div className="text-green-700 font-medium">Optimistisch</div>
+                          <div className="text-green-900 text-lg font-bold">
+                            {result.scenarioRange.vermogen.optimistisch}
+                          </div>
+                        </div>
+                        <div className="bg-blue-50 p-3 rounded">
+                          <div className="text-blue-700 font-medium">Normaal</div>
+                          <div className="text-blue-900 text-lg font-bold">
+                            {result.scenarioRange.vermogen.normaal}
+                          </div>
+                        </div>
+                        <div className="bg-orange-50 p-3 rounded">
+                          <div className="text-orange-700 font-medium">Pessimistisch</div>
+                          <div className="text-orange-900 text-lg font-bold">
+                            {result.scenarioRange.vermogen.pessimistisch}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Besparing (€/jaar)</h4>
+                      <div className="grid grid-cols-3 gap-2 text-sm">
+                        <div className="bg-green-50 p-3 rounded">
+                          <div className="text-green-700 font-medium">Optimistisch</div>
+                          <div className="text-green-900 text-lg font-bold">
+                            €{result.scenarioRange.besparing.optimistisch.toLocaleString("nl-NL", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </div>
+                        </div>
+                        <div className="bg-blue-50 p-3 rounded">
+                          <div className="text-blue-700 font-medium">Normaal</div>
+                          <div className="text-blue-900 text-lg font-bold">
+                            €{result.scenarioRange.besparing.normaal.toLocaleString("nl-NL", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </div>
+                        </div>
+                        <div className="bg-orange-50 p-3 rounded">
+                          <div className="text-orange-700 font-medium">Pessimistisch</div>
+                          <div className="text-orange-900 text-lg font-bold">
+                            €{result.scenarioRange.besparing.pessimistisch.toLocaleString("nl-NL", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <LeadForm tool="warmtepomp" results={result} />
             </>

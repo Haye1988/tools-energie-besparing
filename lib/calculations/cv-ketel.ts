@@ -5,6 +5,8 @@ export interface CvKetelInput {
   gewenstSysteem: "hr-ketel" | "hybride";
   gasPrijs?: number; // €/m³
   stroomPrijs?: number; // €/kWh
+  ketelLeeftijd?: number; // jaren
+  installatieKosten?: number; // € (optioneel)
 }
 
 export interface CvKetelResult {
@@ -14,6 +16,8 @@ export interface CvKetelResult {
   nieuwRendement: number; // %
   gasBesparing: number; // m³/jaar
   kostenBesparing: number; // €/jaar
+  vervangingsAdvies?: boolean; // als ketel >15 jaar
+  terugverdientijd?: number; // jaren
   hybrideAdvies?: {
     warmtepompVermogen: number; // kW
     gasBesparing: number; // m³/jaar
@@ -43,6 +47,8 @@ export function berekenCvKetel(input: CvKetelInput): CvKetelResult {
     gewenstSysteem,
     gasPrijs = 1.2,
     stroomPrijs = 0.27,
+    ketelLeeftijd,
+    installatieKosten,
   } = input;
 
   // Huidig rendement
@@ -65,6 +71,19 @@ export function berekenCvKetel(input: CvKetelInput): CvKetelResult {
 
   // Kostenbesparing
   const kostenBesparing = gasBesparing * gasPrijs;
+
+  // Vervangingsadvies: adviseer vervanging na 15 jaar
+  const vervangingsAdvies = ketelLeeftijd !== undefined && ketelLeeftijd > 15;
+
+  // Terugverdientijd (indien installatiekosten bekend)
+  let terugverdientijd: number | undefined;
+  if (installatieKosten && installatieKosten > 0 && kostenBesparing > 0) {
+    terugverdientijd = installatieKosten / kostenBesparing;
+  } else if (!installatieKosten && kostenBesparing > 0) {
+    // Schatting: €2000-3000, gebruik gemiddelde
+    const geschatteKosten = 2500;
+    terugverdientijd = geschatteKosten / kostenBesparing;
+  }
 
   // Hybride advies (als gekozen)
   let hybrideAdvies;
@@ -93,6 +112,8 @@ export function berekenCvKetel(input: CvKetelInput): CvKetelResult {
     nieuwRendement: Math.round(nieuwRendement * 100),
     gasBesparing: Math.round(gasBesparing),
     kostenBesparing: Math.round(kostenBesparing * 100) / 100,
+    vervangingsAdvies,
+    terugverdientijd: terugverdientijd ? Math.round(terugverdientijd * 10) / 10 : undefined,
     hybrideAdvies,
   };
 }

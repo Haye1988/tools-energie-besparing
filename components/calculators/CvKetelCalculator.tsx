@@ -96,6 +96,42 @@ export default function CvKetelCalculator() {
                 step={0.01}
                 unit="€/m³"
               />
+
+              <InputField
+                label="Stroomprijs"
+                name="stroomPrijs"
+                type="number"
+                value={input.stroomPrijs ?? 0.27}
+                onChange={(val) => setInput({ ...input, stroomPrijs: Number(val) })}
+                min={0}
+                step={0.01}
+                unit="€/kWh"
+              />
+
+              <InputField
+                label="Ketelleeftijd (jaren)"
+                name="ketelLeeftijd"
+                type="number"
+                value={input.ketelLeeftijd || ""}
+                onChange={(val) => setInput({ ...input, ketelLeeftijd: val ? Number(val) : undefined })}
+                min={0}
+                max={50}
+                step={1}
+                unit="jaar"
+                helpText="Voor vervangingsadvies (advies na 15 jaar)"
+              />
+
+              <InputField
+                label="Installatiekosten (optioneel)"
+                name="installatieKosten"
+                type="number"
+                value={input.installatieKosten || ""}
+                onChange={(val) => setInput({ ...input, installatieKosten: val ? Number(val) : undefined })}
+                min={0}
+                step={100}
+                unit="€"
+                helpText="Voor berekening terugverdientijd"
+              />
             </div>
           </div>
         </div>
@@ -149,6 +185,16 @@ export default function CvKetelCalculator() {
                     <strong>Besparing:</strong> €{result.kostenBesparing.toFixed(2)}/jaar (
                     {result.gasBesparing} m³ gas minder)
                   </p>
+                  {result.vervangingsAdvies && (
+                    <p className="text-orange-600 font-semibold">
+                      ⚠️ Vervangingsadvies: Uw ketel is ouder dan 15 jaar. Vervanging wordt aanbevolen.
+                    </p>
+                  )}
+                  {result.terugverdientijd && (
+                    <p>
+                      <strong>Terugverdientijd:</strong> {result.terugverdientijd} jaar
+                    </p>
+                  )}
                 </div>
 
                 {result.hybrideAdvies && (

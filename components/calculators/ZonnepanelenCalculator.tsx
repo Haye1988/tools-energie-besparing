@@ -2,10 +2,13 @@
 
 import { useState, useMemo } from "react";
 import { berekenZonnepanelen, ZonnepanelenInput } from "@/lib/calculations/zonnepanelen";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 import CalculatorLayout from "@/components/shared/CalculatorLayout";
 import InputField from "@/components/shared/InputField";
 import SelectField from "@/components/shared/SelectField";
+import RangeSlider from "@/components/shared/RangeSlider";
 import ResultCard from "@/components/shared/ResultCard";
+import GraphChart from "@/components/shared/GraphChart";
 import LeadForm from "@/components/shared/LeadForm";
 import { Sun, Zap, TrendingUp, Euro } from "lucide-react";
 
@@ -16,16 +19,43 @@ export default function ZonnepanelenCalculator() {
     dakHellingshoek: 35,
     paneelVermogen: 400,
     stroomPrijs: 0.3,
+    schaduwPercentage: 0,
+    salderingActief: true,
+    terugleverVergoeding: 0.08,
+    thuisbatterij: false,
   });
+
+  // Debounce input voor betere performance bij snelle wijzigingen
+  const debouncedInput = useDebounce(input, 300);
 
   const result = useMemo(() => {
     try {
-      return berekenZonnepanelen(input);
+      return berekenZonnepanelen(debouncedInput);
     } catch (error) {
       console.error("Calculation error:", error);
       return null;
     }
-  }, [input]);
+  }, [debouncedInput]);
+
+  // Maandelijkse data voor grafiek (vereenvoudigd - gelijkmatige verdeling)
+  const maandelijkseData = useMemo(() => {
+    if (!result) return [];
+    const maanden = [
+      "Jan", "Feb", "Mrt", "Apr", "Mei", "Jun",
+      "Jul", "Aug", "Sep", "Okt", "Nov", "Dec",
+    ];
+    const maandelijksVerbruik = debouncedInput.jaarlijksVerbruik / 12;
+    const maandelijksOpwekking = result.jaarlijkseOpwekking / 12;
+    
+    // Seizoenscorrectie: zomer meer opwekking, winter minder
+    const seizoensfactoren = [0.3, 0.4, 0.6, 0.9, 1.2, 1.3, 1.3, 1.2, 0.9, 0.6, 0.4, 0.3];
+    
+    return maanden.map((maand, index) => ({
+      maand,
+      verbruik: Math.round(maandelijksVerbruik),
+      opwekking: Math.round(maandelijksOpwekking * seizoensfactoren[index]),
+    }));
+  }, [result, debouncedInput.jaarlijksVerbruik]);
 
   return (
     <CalculatorLayout
@@ -101,6 +131,86 @@ export default function ZonnepanelenCalculator() {
                 step={0.01}
                 unit="€/kWh"
               />
+
+              <RangeSlider
+                label="Schaduwpercentage"
+                name="schaduwPercentage"
+                value={input.schaduwPercentage || 0}
+                onChange={(val) => setInput({ ...input, schaduwPercentage: val })}
+                min={0}
+                max={50}
+                step={5}
+                unit="%"
+                helpText="Hoeveel procent van de dag ligt het dak in de schaduw?"
+              />
+
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="salderingActief"
+                  checked={input.salderingActief ?? true}
+                  onChange={(e) => setInput({ ...input, salderingActief: e.target.checked })}
+                  className="w-4 h-4 text-totaaladvies-orange border-gray-300 rounded focus:ring-totaaladvies-orange"
+                />
+                <label htmlFor="salderingActief" className="text-sm font-medium text-totaaladvies-gray-medium">
+                  Saldering actief (100% saldering)
+                </label>
+              </div>
+
+              {!input.salderingActief && (
+                <InputField
+                  label="Terugleververgoeding"
+                  name="terugleverVergoeding"
+                  type="number"
+                  value={input.terugleverVergoeding || 0.08}
+                  onChange={(val) => setInput({ ...input, terugleverVergoeding: Number(val) })}
+                  min={0}
+                  max={0.5}
+                  step={0.01}
+                  unit="€/kWh"
+                  helpText="Vergoeding voor teruggeleverde stroom (standaard €0.08/kWh)"
+                />
+              )}
+
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="thuisbatterij"
+                  checked={input.thuisbatterij ?? false}
+                  onChange={(e) => setInput({ ...input, thuisbatterij: e.target.checked })}
+                  className="w-4 h-4 text-totaaladvies-orange border-gray-300 rounded focus:ring-totaaladvies-orange"
+                />
+                <label htmlFor="thuisbatterij" className="text-sm font-medium text-totaaladvies-gray-medium">
+                  Thuisbatterij
+                </label>
+              </div>
+
+              {input.thuisbatterij && (
+                <InputField
+                  label="Batterijcapaciteit"
+                  name="batterijCapaciteit"
+                  type="number"
+                  value={input.batterijCapaciteit || ""}
+                  onChange={(val) => setInput({ ...input, batterijCapaciteit: val ? Number(val) : undefined })}
+                  min={0}
+                  max={20}
+                  step={1}
+                  unit="kWh"
+                  helpText="Capaciteit van de thuisbatterij"
+                />
+              )}
+
+              <InputField
+                label="Investeringskosten (optioneel)"
+                name="investeringsKosten"
+                type="number"
+                value={input.investeringsKosten || ""}
+                onChange={(val) => setInput({ ...input, investeringsKosten: val ? Number(val) : undefined })}
+                min={0}
+                step={1000}
+                unit="€"
+                helpText="Voor berekening terugverdientijd (standaard ~€1000 per kWp)"
+              />
             </div>
           </div>
         </div>
@@ -171,8 +281,57 @@ export default function ZonnepanelenCalculator() {
                     </strong>{" "}
                     per jaar aan stroomkosten.
                   </p>
+                  {result.terugverdientijd && (
+                    <p>
+                      <strong>Terugverdientijd:</strong> {result.terugverdientijd} jaar
+                    </p>
+                  )}
+                  {result.besparingMetSaldering && result.besparingZonderSaldering && (
+                    <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
+                      <p className="text-sm text-blue-900">
+                        <strong>Met saldering:</strong> €
+                        {result.besparingMetSaldering.toLocaleString("nl-NL", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                        /jaar
+                      </p>
+                      <p className="text-sm text-blue-900">
+                        <strong>Zonder saldering:</strong> €
+                        {result.besparingZonderSaldering.toLocaleString("nl-NL", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                        /jaar
+                      </p>
+                    </div>
+                  )}
+                  {result.zelfconsumptieMetBatterij && (
+                    <p className="mt-2">
+                      <strong>Zelfconsumptie met batterij:</strong> {result.zelfconsumptieMetBatterij}%
+                    </p>
+                  )}
                 </div>
               </div>
+
+              {maandelijkseData.length > 0 && (
+                <div className="bg-white rounded-card border border-gray-100 p-6 lg:p-8 shadow-card">
+                  <h3 className="text-xl font-bold text-totaaladvies-blue mb-4">
+                    Verbruik vs Opwekking per Maand
+                  </h3>
+                  <GraphChart
+                    type="bar"
+                    data={maandelijkseData}
+                    dataKey="maand"
+                    bars={[
+                      { key: "verbruik", name: "Verbruik (kWh)", color: "#ef4444" },
+                      { key: "opwekking", name: "Opwekking (kWh)", color: "#10b981" },
+                    ]}
+                    xAxisLabel="Maand"
+                    yAxisLabel="kWh"
+                  />
+                </div>
+              )}
 
               <LeadForm tool="zonnepanelen" results={result} />
             </>
