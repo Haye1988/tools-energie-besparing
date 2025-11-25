@@ -10,21 +10,23 @@ test.describe("Isolatie Calculator", () => {
     await expect(page.getByLabel(/Woningtype/i)).toBeVisible();
   });
 
-  test("should calculate realistic savings for spouwmuur isolation (hoekwoning ~400 m³)", async ({ page }) => {
+  test("should calculate realistic savings for spouwmuur isolation (hoekwoning ~400 m³)", async ({
+    page,
+  }) => {
     await page.getByLabel(/Woningtype/i).selectOption("hoekwoning");
     await page.getByLabel(/Jaarlijks gasverbruik/i).fill("1200");
-    
+
     // Select spouwmuur isolatie
     await page.getByLabel(/Spouwmuur/i).check();
-    
+
     // Wait for results
     await expect(page.getByText(/Totaal gasbesparing/i)).toBeVisible({ timeout: 5000 });
-    
+
     // Check that savings are realistic (should be around 300-500 m³ for hoekwoning spouw)
     const besparingText = await page.getByText(/Totaal gasbesparing/i).textContent();
     const besparingMatch = besparingText?.match(/(\d+)\s*m³/);
-    if (besparingMatch) {
-      const besparing = parseInt(besparingMatch[1]);
+    if (besparingMatch && besparingMatch[1]) {
+      const besparing = parseInt(besparingMatch[1], 10);
       expect(besparing).toBeGreaterThan(200); // Should be significant
     }
   });
@@ -35,7 +37,7 @@ test.describe("Isolatie Calculator", () => {
     await page.getByLabel(/Dak/i).check();
     await page.getByLabel(/Spouwmuur/i).check();
     await page.getByLabel(/Vloer/i).check();
-    
+
     await expect(page.getByText(/Prioriteit advies/i)).toBeVisible({ timeout: 5000 });
     await expect(page.getByText(/Beste keuze/i)).toBeVisible();
   });
@@ -43,8 +45,7 @@ test.describe("Isolatie Calculator", () => {
   test("should show combination effect warning", async ({ page }) => {
     await page.getByLabel(/Dak/i).check();
     await page.getByLabel(/Spouwmuur/i).check();
-    
+
     await expect(page.getByText(/combinatie-effect/i)).toBeVisible({ timeout: 5000 });
   });
 });
-

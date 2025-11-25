@@ -1,6 +1,17 @@
 "use client";
 
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import { cn } from "@/lib/utils";
 
 interface GraphChartProps {
@@ -35,8 +46,17 @@ export default function GraphChart({
         {type === "line" ? (
           <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={dataKey} label={xAxisLabel ? { value: xAxisLabel, position: "insideBottom", offset: -5 } : undefined} />
-            <YAxis label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft" } : undefined} />
+            <XAxis
+              dataKey={dataKey}
+              label={
+                xAxisLabel ? { value: xAxisLabel, position: "insideBottom", offset: -5 } : undefined
+              }
+            />
+            <YAxis
+              label={
+                yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft" } : undefined
+              }
+            />
             <Tooltip />
             <Legend />
             {lines?.map((line, index) => (
@@ -53,8 +73,17 @@ export default function GraphChart({
         ) : (
           <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={dataKey} label={xAxisLabel ? { value: xAxisLabel, position: "insideBottom", offset: -5 } : undefined} />
-            <YAxis label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft" } : undefined} />
+            <XAxis
+              dataKey={dataKey}
+              label={
+                xAxisLabel ? { value: xAxisLabel, position: "insideBottom", offset: -5 } : undefined
+              }
+            />
+            <YAxis
+              label={
+                yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft" } : undefined
+              }
+            />
             <Tooltip />
             <Legend />
             {bars?.map((bar, index) => (
@@ -71,4 +100,3 @@ export default function GraphChart({
     </div>
   );
 }
-

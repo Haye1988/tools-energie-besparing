@@ -51,4 +51,3 @@ export default function InfoTooltip({ content, source, sourceUrl, className }: I
     </div>
   );
 }
-

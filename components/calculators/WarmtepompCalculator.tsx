@@ -129,7 +129,9 @@ export default function WarmtepompCalculator() {
                 name="installatieKosten"
                 type="number"
                 value={input.installatieKosten || ""}
-                onChange={(val) => setInput({ ...input, installatieKosten: val ? Number(val) : undefined })}
+                onChange={(val) =>
+                  setInput({ ...input, installatieKosten: val ? Number(val) : undefined })
+                }
                 min={0}
                 step={1000}
                 unit="€"
@@ -246,7 +248,8 @@ export default function WarmtepompCalculator() {
                         <div className="bg-green-50 p-3 rounded">
                           <div className="text-green-700 font-medium">Optimistisch</div>
                           <div className="text-green-900 text-lg font-bold">
-                            €{result.scenarioRange.besparing.optimistisch.toLocaleString("nl-NL", {
+                            €
+                            {result.scenarioRange.besparing.optimistisch.toLocaleString("nl-NL", {
                               minimumFractionDigits: 2,
                               maximumFractionDigits: 2,
                             })}
@@ -255,7 +258,8 @@ export default function WarmtepompCalculator() {
                         <div className="bg-blue-50 p-3 rounded">
                           <div className="text-blue-700 font-medium">Normaal</div>
                           <div className="text-blue-900 text-lg font-bold">
-                            €{result.scenarioRange.besparing.normaal.toLocaleString("nl-NL", {
+                            €
+                            {result.scenarioRange.besparing.normaal.toLocaleString("nl-NL", {
                               minimumFractionDigits: 2,
                               maximumFractionDigits: 2,
                             })}
@@ -264,7 +268,8 @@ export default function WarmtepompCalculator() {
                         <div className="bg-orange-50 p-3 rounded">
                           <div className="text-orange-700 font-medium">Pessimistisch</div>
                           <div className="text-orange-900 text-lg font-bold">
-                            €{result.scenarioRange.besparing.pessimistisch.toLocaleString("nl-NL", {
+                            €
+                            {result.scenarioRange.besparing.pessimistisch.toLocaleString("nl-NL", {
                               minimumFractionDigits: 2,
                               maximumFractionDigits: 2,
                             })}

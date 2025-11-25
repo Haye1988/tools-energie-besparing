@@ -63,7 +63,7 @@ export function berekenLaadpaal(input: LaadpaalInput): LaadpaalResult {
     netaansluiting,
     dynamischContract = false,
     dagTarief = 0.35,
-    nachtTarief = 0.20,
+    nachtTarief = 0.2,
     zonnepanelen,
   } = input;
 

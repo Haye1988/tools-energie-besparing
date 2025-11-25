@@ -133,7 +133,10 @@ export default function AIChat({ tool, context, className }: AIChatProps) {
 
                       if (response.ok) {
                         const data = await response.json();
-                        const assistantMessage: Message = { role: "assistant", content: data.answer };
+                        const assistantMessage: Message = {
+                          role: "assistant",
+                          content: data.answer,
+                        };
                         setMessages([userMessage, assistantMessage]);
                       } else {
                         throw new Error("Failed to get AI response");

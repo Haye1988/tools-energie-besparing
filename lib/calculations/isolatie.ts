@@ -237,4 +237,3 @@ export function berekenIsolatie(input: IsolatieInput): IsolatieResult {
       totaalInvesteringsKosten > 0 ? Math.round(totaalInvesteringsKosten) : undefined,
   };
 }
-

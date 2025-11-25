@@ -129,7 +129,9 @@ export default function KozijnenCalculator() {
                 name="investeringsKosten"
                 type="number"
                 value={input.investeringsKosten || ""}
-                onChange={(val) => setInput({ ...input, investeringsKosten: val ? Number(val) : undefined })}
+                onChange={(val) =>
+                  setInput({ ...input, investeringsKosten: val ? Number(val) : undefined })
+                }
                 min={0}
                 step={100}
                 unit="€"

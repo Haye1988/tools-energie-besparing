@@ -12,15 +12,14 @@ test.describe("Thuisbatterij Calculator", () => {
   test("should show savings with and without saldering", async ({ page }) => {
     await page.getByLabel(/Zonnepaneel vermogen/i).fill("5");
     await page.getByLabel(/Jaarlijks verbruik/i).fill("3500");
-    
+
     await expect(page.getByText(/Besparing/i)).toBeVisible({ timeout: 5000 });
   });
 
   test("should calculate payback time when investment costs provided", async ({ page }) => {
     await page.getByLabel(/Zonnepaneel vermogen/i).fill("5");
     await page.getByLabel(/Investeringskosten/i).fill("8000");
-    
+
     await expect(page.getByText(/Terugverdientijd/i)).toBeVisible({ timeout: 5000 });
   });
 });
-

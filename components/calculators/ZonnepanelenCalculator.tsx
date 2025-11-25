@@ -39,21 +39,31 @@ export default function ZonnepanelenCalculator() {
 
   // Maandelijkse data voor grafiek (vereenvoudigd - gelijkmatige verdeling)
   const maandelijkseData = useMemo(() => {
-    if (!result) return [];
+    if (!result || !result.jaarlijkseOpwekking) return [];
     const maanden = [
-      "Jan", "Feb", "Mrt", "Apr", "Mei", "Jun",
-      "Jul", "Aug", "Sep", "Okt", "Nov", "Dec",
+      "Jan",
+      "Feb",
+      "Mrt",
+      "Apr",
+      "Mei",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Okt",
+      "Nov",
+      "Dec",
     ];
     const maandelijksVerbruik = debouncedInput.jaarlijksVerbruik / 12;
     const maandelijksOpwekking = result.jaarlijkseOpwekking / 12;
-    
+
     // Seizoenscorrectie: zomer meer opwekking, winter minder
     const seizoensfactoren = [0.3, 0.4, 0.6, 0.9, 1.2, 1.3, 1.3, 1.2, 0.9, 0.6, 0.4, 0.3];
-    
+
     return maanden.map((maand, index) => ({
       maand,
       verbruik: Math.round(maandelijksVerbruik),
-      opwekking: Math.round(maandelijksOpwekking * seizoensfactoren[index]),
+      opwekking: Math.round(maandelijksOpwekking * seizoensfactoren[index]!),
     }));
   }, [result, debouncedInput.jaarlijksVerbruik]);
 
@@ -152,7 +162,10 @@ export default function ZonnepanelenCalculator() {
                   onChange={(e) => setInput({ ...input, salderingActief: e.target.checked })}
                   className="w-4 h-4 text-totaaladvies-orange border-gray-300 rounded focus:ring-totaaladvies-orange"
                 />
-                <label htmlFor="salderingActief" className="text-sm font-medium text-totaaladvies-gray-medium">
+                <label
+                  htmlFor="salderingActief"
+                  className="text-sm font-medium text-totaaladvies-gray-medium"
+                >
                   Saldering actief (100% saldering)
                 </label>
               </div>
@@ -180,24 +193,21 @@ export default function ZonnepanelenCalculator() {
                   onChange={(e) => setInput({ ...input, thuisbatterij: e.target.checked })}
                   className="w-4 h-4 text-totaaladvies-orange border-gray-300 rounded focus:ring-totaaladvies-orange"
                 />
-                <label htmlFor="thuisbatterij" className="text-sm font-medium text-totaaladvies-gray-medium">
+                <label
+                  htmlFor="thuisbatterij"
+                  className="text-sm font-medium text-totaaladvies-gray-medium"
+                >
                   Thuisbatterij
                 </label>
               </div>
 
               {input.thuisbatterij && (
-                <InputField
-                  label="Batterijcapaciteit"
-                  name="batterijCapaciteit"
-                  type="number"
-                  value={input.batterijCapaciteit || ""}
-                  onChange={(val) => setInput({ ...input, batterijCapaciteit: val ? Number(val) : undefined })}
-                  min={0}
-                  max={20}
-                  step={1}
-                  unit="kWh"
-                  helpText="Capaciteit van de thuisbatterij"
-                />
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-900">
+                    De batterijcapaciteit wordt automatisch berekend op basis van uw zonnepaneel
+                    vermogen (1.0-1.5 × kWp).
+                  </p>
+                </div>
               )}
 
               <InputField
@@ -205,7 +215,9 @@ export default function ZonnepanelenCalculator() {
                 name="investeringsKosten"
                 type="number"
                 value={input.investeringsKosten || ""}
-                onChange={(val) => setInput({ ...input, investeringsKosten: val ? Number(val) : undefined })}
+                onChange={(val) =>
+                  setInput({ ...input, investeringsKosten: val ? Number(val) : undefined })
+                }
                 min={0}
                 step={1000}
                 unit="€"
@@ -308,7 +320,8 @@ export default function ZonnepanelenCalculator() {
                   )}
                   {result.zelfconsumptieMetBatterij && (
                     <p className="mt-2">
-                      <strong>Zelfconsumptie met batterij:</strong> {result.zelfconsumptieMetBatterij}%
+                      <strong>Zelfconsumptie met batterij:</strong>{" "}
+                      {result.zelfconsumptieMetBatterij}%
                     </p>
                   )}
                 </div>

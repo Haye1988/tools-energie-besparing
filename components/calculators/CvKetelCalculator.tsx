@@ -113,7 +113,9 @@ export default function CvKetelCalculator() {
                 name="ketelLeeftijd"
                 type="number"
                 value={input.ketelLeeftijd || ""}
-                onChange={(val) => setInput({ ...input, ketelLeeftijd: val ? Number(val) : undefined })}
+                onChange={(val) =>
+                  setInput({ ...input, ketelLeeftijd: val ? Number(val) : undefined })
+                }
                 min={0}
                 max={50}
                 step={1}
@@ -126,7 +128,9 @@ export default function CvKetelCalculator() {
                 name="installatieKosten"
                 type="number"
                 value={input.installatieKosten || ""}
-                onChange={(val) => setInput({ ...input, installatieKosten: val ? Number(val) : undefined })}
+                onChange={(val) =>
+                  setInput({ ...input, installatieKosten: val ? Number(val) : undefined })
+                }
                 min={0}
                 step={100}
                 unit="€"
@@ -187,7 +191,8 @@ export default function CvKetelCalculator() {
                   </p>
                   {result.vervangingsAdvies && (
                     <p className="text-orange-600 font-semibold">
-                      ⚠️ Vervangingsadvies: Uw ketel is ouder dan 15 jaar. Vervanging wordt aanbevolen.
+                      ⚠️ Vervangingsadvies: Uw ketel is ouder dan 15 jaar. Vervanging wordt
+                      aanbevolen.
                     </p>
                   )}
                   {result.terugverdientijd && (

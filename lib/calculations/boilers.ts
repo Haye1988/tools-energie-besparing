@@ -74,15 +74,19 @@ export function berekenBoilers(input: BoilersInput): BoilersResult {
   // Douche: ~7 L/min, bad: ~150 L
   const doucheVerbruikPerDag = (doucheMinutenPerDag * 7 * aantalPersonen) / 1000; // m³
   const badVerbruikPerDag = (aantalBadenPerWeek * 150 * aantalPersonen) / (7 * 1000); // m³
-  const totaalVerbruikPerDag = doucheVerbruikPerDag + badVerbruikPerDag + (aantalPersonen * 5) / 1000; // +5L per persoon voor keuken
+  const totaalVerbruikPerDag =
+    doucheVerbruikPerDag + badVerbruikPerDag + (aantalPersonen * 5) / 1000; // +5L per persoon voor keuken
   const literPerDag = totaalVerbruikPerDag * 1000;
 
   // Gebruik berekend verbruik of standaard waarde
   const literPerPersoonPerDag = literPerDag / aantalPersonen;
-  const gebruikteBehoefte = literPerPersoonPerDag > 0 ? literPerPersoonPerDag : (warmwaterBehoeftePerPersoon[warmwaterBehoefteValue] || 40);
+  const gebruikteBehoefte =
+    literPerPersoonPerDag > 0
+      ? literPerPersoonPerDag
+      : warmwaterBehoeftePerPersoon[warmwaterBehoefteValue] || 40;
 
   // Aanbevolen volume
-  const aanbevolenVolume = Math.ceil((aantalPersonen * gebruikteBehoefte * 1.5));
+  const aanbevolenVolume = Math.ceil(aantalPersonen * gebruikteBehoefte * 1.5);
 
   // Vermogen advies (kW) - voor opwarmen in redelijke tijd
   // Aanname: 100 liter opwarmen van 10°C naar 60°C in 1 uur ≈ 5.8 kW

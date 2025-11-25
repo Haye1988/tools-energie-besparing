@@ -14,7 +14,6 @@ export default function LaadpaalCalculator() {
     gewensteLaadtijd: 8,
     huisaansluiting: "1-fase",
     zonnepanelen: false,
-    stroomPrijs: 0.27,
   });
 
   const result = useMemo(() => {
@@ -87,15 +86,44 @@ export default function LaadpaalCalculator() {
               </div>
 
               <InputField
-                label="Stroomprijs"
-                name="stroomPrijs"
+                label="Dagtarief"
+                name="dagTarief"
                 type="number"
-                value={input.stroomPrijs ?? 0.27}
-                onChange={(val) => setInput({ ...input, stroomPrijs: Number(val) })}
+                value={input.dagTarief ?? 0.35}
+                onChange={(val) => setInput({ ...input, dagTarief: Number(val) })}
                 min={0}
                 step={0.01}
                 unit="€/kWh"
+                helpText="Stroomprijs overdag (standaard €0.35/kWh)"
               />
+
+              <InputField
+                label="Nachttarief"
+                name="nachtTarief"
+                type="number"
+                value={input.nachtTarief ?? 0.2}
+                onChange={(val) => setInput({ ...input, nachtTarief: Number(val) })}
+                min={0}
+                step={0.01}
+                unit="€/kWh"
+                helpText="Stroomprijs 's nachts (standaard €0.20/kWh)"
+              />
+
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="dynamischContract"
+                  checked={input.dynamischContract ?? false}
+                  onChange={(e) => setInput({ ...input, dynamischContract: e.target.checked })}
+                  className="w-4 h-4 text-totaaladvies-orange border-gray-300 rounded focus:ring-totaaladvies-orange"
+                />
+                <label
+                  htmlFor="dynamischContract"
+                  className="text-sm font-medium text-totaaladvies-gray-medium"
+                >
+                  Dynamisch contract (variabele tarieven)
+                </label>
+              </div>
             </div>
           </div>
         </div>

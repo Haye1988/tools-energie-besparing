@@ -43,8 +43,8 @@ const woningTypeFactoren: Record<string, number> = {
 // Isolatie correctiefactoren: +10% bij slecht, -10% bij goed
 const isolatieFactoren: Record<string, number> = {
   slecht: 1.1, // +10%
-  matig: 1.0,  // geen correctie
-  goed: 0.9,   // -10%
+  matig: 1.0, // geen correctie
+  goed: 0.9, // -10%
 };
 
 export function berekenWarmtepomp(input: WarmtepompInput): WarmtepompResult {

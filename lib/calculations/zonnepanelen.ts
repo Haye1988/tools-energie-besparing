@@ -27,10 +27,10 @@ export interface ZonnepanelenResult {
 // Opbrengstfactor per oriëntatie (kWh per Wp per jaar) - verfijnd
 const opbrengstFactoren: Record<string, number> = {
   zuid: 0.85, // Verfijnd van 0.9 naar 0.85
-  zuidoost: 0.80,
-  zuidwest: 0.80,
-  oost: 0.70, // Verfijnd van 0.75 naar 0.70
-  west: 0.70, // Verfijnd van 0.75 naar 0.70
+  zuidoost: 0.8,
+  zuidwest: 0.8,
+  oost: 0.7, // Verfijnd van 0.75 naar 0.70
+  west: 0.7, // Verfijnd van 0.75 naar 0.70
   noord: 0.5,
 };
 
@@ -95,17 +95,14 @@ export function berekenZonnepanelen(input: ZonnepanelenInput): ZonnepanelenResul
   const terugleveringMetBatterij = Math.max(0, jaarlijkseOpwekking - zelfconsumptieMetBatterij);
 
   // Besparing met saldering (100% saldering)
-  const besparingMetSaldering =
-    Math.min(jaarlijkseOpwekking, jaarlijksVerbruik) * stroomPrijs;
+  const besparingMetSaldering = Math.min(jaarlijkseOpwekking, jaarlijksVerbruik) * stroomPrijs;
 
   // Besparing zonder saldering (terugleververgoeding)
   const besparingZonderSaldering =
     zelfconsumptieMetBatterij * stroomPrijs + terugleveringMetBatterij * terugleverVergoeding;
 
   // Standaard besparing (afhankelijk van saldering status)
-  const jaarlijkseBesparing = salderingActief
-    ? besparingMetSaldering
-    : besparingZonderSaldering;
+  const jaarlijkseBesparing = salderingActief ? besparingMetSaldering : besparingZonderSaldering;
 
   // Terugverdientijd (indien investeringskosten bekend)
   let terugverdientijd: number | undefined;

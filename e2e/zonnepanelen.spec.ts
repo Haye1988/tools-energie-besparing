@@ -22,11 +22,11 @@ test.describe("Zonnepanelen Calculator", () => {
 
   test("should show shadow slider and affect results", async ({ page }) => {
     await page.getByLabel(/Jaarlijks stroomverbruik/i).fill("3500");
-    
+
     // Adjust shadow percentage
     const shadowSlider = page.locator('input[type="range"][name="schaduwPercentage"]');
     await shadowSlider.fill("30");
-    
+
     // Results should update
     await expect(page.getByText(/Aantal panelen/i)).toBeVisible({ timeout: 5000 });
   });
@@ -34,13 +34,13 @@ test.describe("Zonnepanelen Calculator", () => {
   test("should show savings with and without saldering", async ({ page }) => {
     await page.getByLabel(/Jaarlijks stroomverbruik/i).fill("3500");
     await page.getByLabel(/Saldering actief/i).uncheck();
-    
+
     await expect(page.getByText(/Zonder saldering/i)).toBeVisible({ timeout: 5000 });
   });
 
   test("should show graph chart", async ({ page }) => {
     await page.getByLabel(/Jaarlijks stroomverbruik/i).fill("3500");
-    
+
     await expect(page.getByText(/Verbruik vs Opwekking per Maand/i)).toBeVisible({ timeout: 5000 });
   });
 

@@ -53,11 +53,16 @@ export default function RangeSlider({
         }}
       />
       <div className="flex justify-between text-xs text-totaaladvies-gray-medium">
-        <span>{min}{unit && ` ${unit}`}</span>
-        <span>{max}{unit && ` ${unit}`}</span>
+        <span>
+          {min}
+          {unit && ` ${unit}`}
+        </span>
+        <span>
+          {max}
+          {unit && ` ${unit}`}
+        </span>
       </div>
       {helpText && <p className="text-xs text-totaaladvies-gray-medium">{helpText}</p>}
     </div>
   );
 }
-

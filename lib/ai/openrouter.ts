@@ -209,12 +209,16 @@ export async function getAIResponse(request: OpenRouterRequest): Promise<OpenRou
     }
 
     const data = await response.json();
-    
+
     // Voeg automatisch bronvermelding toe aan antwoord
     let answer = data.choices?.[0]?.message?.content || "Geen antwoord ontvangen.";
-    
+
     // Voeg bronvermelding toe als deze niet al aanwezig is
-    if (!answer.includes("HIER") && !answer.includes("Milieu Centraal") && !answer.includes("bron")) {
+    if (
+      !answer.includes("HIER") &&
+      !answer.includes("Milieu Centraal") &&
+      !answer.includes("bron")
+    ) {
       answer += "\n\nVoor meer informatie kun je terecht bij HIER (hier.nu) of Milieu Centraal.";
     }
 
@@ -231,7 +235,7 @@ export async function getAIResponse(request: OpenRouterRequest): Promise<OpenRou
 // Formatteer context op een leesbare manier voor AI
 function formatContextSummary(context: Record<string, any>): string {
   const parts: string[] = [];
-  
+
   for (const [key, value] of Object.entries(context)) {
     if (value !== null && value !== undefined && value !== "") {
       // Format specifieke velden
@@ -242,6 +246,6 @@ function formatContextSummary(context: Record<string, any>): string {
       }
     }
   }
-  
+
   return parts.join("\n");
 }

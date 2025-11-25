@@ -62,9 +62,7 @@ export default function InputField({
           </span>
         )}
       </div>
-      {helpText && (
-        <p className="text-xs text-totaaladvies-gray-medium">{helpText}</p>
-      )}
+      {helpText && <p className="text-xs text-totaaladvies-gray-medium">{helpText}</p>}
     </div>
   );
 }

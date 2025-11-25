@@ -181,7 +181,9 @@ export default function IsolatieCalculator() {
 
               {input.maatregelen.length > 0 && (
                 <div className="pt-4 border-t border-gray-200">
-                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Investeringskosten (optioneel)</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                    Investeringskosten (optioneel)
+                  </h3>
                   <div className="space-y-3">
                     {input.maatregelen.map((maatregel) => (
                       <InputField
@@ -246,7 +248,9 @@ export default function IsolatieCalculator() {
 
               {result.totaalInvesteringsKosten && (
                 <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Totaal investeringskosten</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    Totaal investeringskosten
+                  </h3>
                   <p className="text-2xl font-bold text-totaaladvies-blue">
                     €{result.totaalInvesteringsKosten.toLocaleString("nl-NL")}
                   </p>
@@ -273,7 +277,8 @@ export default function IsolatieCalculator() {
                       >
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-semibold text-gray-900 capitalize">
-                            {index + 1}. {advies.maatregel === "spouw"
+                            {index + 1}.{" "}
+                            {advies.maatregel === "spouw"
                               ? "Spouwmuur"
                               : advies.maatregel === "glas"
                                 ? "HR++ glas"
@@ -302,8 +307,9 @@ export default function IsolatieCalculator() {
               {result.maatregelen.length > 1 && (
                 <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
                   <p className="text-sm text-yellow-800">
-                    <strong>Let op:</strong> Bij meerdere maatregelen is de totale besparing lager dan de som
-                    van individuele besparingen (combinatie-effect). De berekening houdt hier rekening mee.
+                    <strong>Let op:</strong> Bij meerdere maatregelen is de totale besparing lager
+                    dan de som van individuele besparingen (combinatie-effect). De berekening houdt
+                    hier rekening mee.
                   </p>
                 </div>
               )}

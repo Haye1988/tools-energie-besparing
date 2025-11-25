@@ -109,7 +109,8 @@ export function berekenEnergielabel(input: EnergielabelInput): EnergielabelResul
     muren: input.isolatieMuren === "goed" ? 80 : input.isolatieMuren === "matig" ? 150 : 300,
     vloer: input.isolatieVloer === "goed" ? 40 : input.isolatieVloer === "matig" ? 80 : 150,
     ramen: input.glasType === "hr" ? 20 : input.glasType === "dubbel" ? 50 : 100,
-    ventilatie: input.ventilatieType === "wtw" ? 30 : input.ventilatieType === "mechanisch" ? 60 : 100,
+    ventilatie:
+      input.ventilatieType === "wtw" ? 30 : input.ventilatieType === "mechanisch" ? 60 : 100,
   };
 
   // Verbeter advies
