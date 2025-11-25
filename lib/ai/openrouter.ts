@@ -209,8 +209,7 @@ export async function getAIResponse(request: OpenRouterRequest): Promise<OpenRou
     }
 
     const data = await response.json();
-    const answer = data.choices?.[0]?.message?.content || "Geen antwoord ontvangen.";
-
+    
     // Voeg automatisch bronvermelding toe aan antwoord
     let answer = data.choices?.[0]?.message?.content || "Geen antwoord ontvangen.";
     
