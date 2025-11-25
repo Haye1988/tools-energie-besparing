@@ -185,21 +185,6 @@ export default function ZonnepanelenCalculator() {
                 />
               )}
 
-              {!input.salderingActief && (
-                <InputField
-                  label="Terugleververgoeding"
-                  name="terugleverVergoeding"
-                  type="number"
-                  value={input.terugleverVergoeding || 0.08}
-                  onChange={(val) => setInput({ ...input, terugleverVergoeding: Number(val) })}
-                  min={0}
-                  max={0.5}
-                  step={0.01}
-                  unit="€/kWh"
-                  helpText="Vergoeding voor teruggeleverde stroom (standaard €0.08/kWh)"
-                />
-              )}
-
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"

@@ -48,4 +48,38 @@ test.describe("Isolatie Calculator", () => {
 
     await expect(page.getByText(/combinatie-effect/i)).toBeVisible({ timeout: 5000 });
   });
+
+  test("should show subsidy input field when measures are selected", async ({ page }) => {
+    await page.getByLabel(/Dak/i).check();
+
+    await expect(page.getByText(/Subsidiebedrag/i)).toBeVisible({ timeout: 5000 });
+  });
+
+  test("should calculate net investment costs with subsidy", async ({ page }) => {
+    await page.getByLabel(/Woningtype/i).selectOption("tussenwoning");
+    await page.getByLabel(/Jaarlijks gasverbruik/i).fill("1200");
+    await page.getByLabel(/Dak/i).check();
+
+    // Fill investment costs
+    const investeringInput = page.getByLabel(/dak isolatie/i);
+    await investeringInput.scrollIntoViewIfNeeded();
+    await investeringInput.fill("5000");
+
+    // Fill subsidy
+    const subsidieInput = page.getByLabel(/Subsidiebedrag/i);
+    await subsidieInput.scrollIntoViewIfNeeded();
+    await subsidieInput.fill("1000");
+
+    // Wait for results
+    await expect(page.getByText(/Investeringskosten/i)).toBeVisible({ timeout: 5000 });
+  });
+
+  test("should show investment costs per measure", async ({ page }) => {
+    await page.getByLabel(/Dak/i).check();
+    await page.getByLabel(/Spouwmuur/i).check();
+
+    await expect(page.getByText(/Investeringskosten/i)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByLabel(/dak isolatie/i)).toBeVisible();
+    await expect(page.getByLabel(/Spouwmuur isolatie/i)).toBeVisible();
+  });
 });

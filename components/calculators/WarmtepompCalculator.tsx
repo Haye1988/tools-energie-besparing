@@ -172,7 +172,7 @@ export default function WarmtepompCalculator() {
 
         <div className="space-y-6">
           {result && (
-            <>
+            <div aria-live="polite" aria-atomic="false">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <ResultCard
                   title="Benodigd vermogen"
@@ -311,7 +311,7 @@ export default function WarmtepompCalculator() {
               )}
 
               <LeadForm tool="warmtepomp" results={result} />
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -50,19 +50,21 @@ export default function ResultCard({
         variantStyles[variant],
         className
       )}
+      role="region"
+      aria-label={title}
     >
       {icon && (
-        <div className={cn("flex justify-center mb-3", iconColors[variant])}>
+        <div className={cn("flex justify-center mb-3", iconColors[variant])} aria-hidden="true">
           <div className="text-3xl">{icon}</div>
         </div>
       )}
       <h3 className="text-sm font-medium text-totaaladvies-gray-medium mb-3">{title}</h3>
-      <div className="flex items-baseline justify-center gap-2">
+      <div className="flex items-baseline justify-center gap-2" aria-live="polite" aria-atomic="true">
         <span className="text-4xl lg:text-5xl font-extrabold text-totaaladvies-blue">
           {formatValue(value)}
         </span>
         {unit && unit !== "€" && unit !== "EUR" && (
-          <span className="text-xl font-medium text-totaaladvies-gray-medium">{unit}</span>
+          <span className="text-xl font-medium text-totaaladvies-gray-medium" aria-label={`${formatValue(value)} ${unit}`}>{unit}</span>
         )}
       </div>
       {subtitle && <p className="text-sm text-totaaladvies-gray-medium mt-3">{subtitle}</p>}

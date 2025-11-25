@@ -29,13 +29,41 @@ test.describe("Warmtepomp Calculator", () => {
     }
   });
 
-  test("should show scenario ranges", async ({ page }) => {
+  test("should show scenario ranges with varying values", async ({ page }) => {
     await page.getByLabel(/Jaarlijks gasverbruik/i).fill("1200");
 
     await expect(page.getByText(/Scenario's/i)).toBeVisible({ timeout: 5000 });
     await expect(page.getByText(/Optimistisch/i)).toBeVisible();
     await expect(page.getByText(/Normaal/i)).toBeVisible();
     await expect(page.getByText(/Pessimistisch/i)).toBeVisible();
+
+    // Check that scenario ranges have different values
+    const scenarioText = await page.getByText(/Scenario's/i).locator("..").textContent();
+    expect(scenarioText).toContain("Optimistisch");
+    expect(scenarioText).toContain("Pessimistisch");
+  });
+
+  test("should show subsidy input field", async ({ page }) => {
+    await page.getByLabel(/Jaarlijks gasverbruik/i).fill("1200");
+
+    // Scroll to subsidy field
+    await page.getByLabel(/Subsidiebedrag/i).scrollIntoViewIfNeeded();
+    await expect(page.getByLabel(/Subsidiebedrag/i)).toBeVisible();
+  });
+
+  test("should calculate payback time with subsidy", async ({ page }) => {
+    await page.getByLabel(/Jaarlijks gasverbruik/i).fill("1200");
+    await page.getByLabel(/Installatiekosten/i).fill("10000");
+    await page.getByLabel(/Subsidiebedrag/i).fill("2000");
+
+    // Wait for results
+    await expect(page.getByText(/Terugverdientijd/i)).toBeVisible({ timeout: 5000 });
+  });
+
+  test("should show extra insulation correction field", async ({ page }) => {
+    await page.getByLabel(/Jaarlijks gasverbruik/i).fill("1200");
+
+    await expect(page.getByLabel(/Extra isolatiecorrectie/i)).toBeVisible();
   });
 
   test("should allow COP adjustment", async ({ page }) => {

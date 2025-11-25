@@ -38,6 +38,31 @@ test.describe("Zonnepanelen Calculator", () => {
     await expect(page.getByText(/Zonder saldering/i)).toBeVisible({ timeout: 5000 });
   });
 
+  test("should show terugleververgoeding input when saldering is disabled", async ({ page }) => {
+    await page.getByLabel(/Jaarlijks stroomverbruik/i).fill("3500");
+    await page.getByLabel(/Saldering actief/i).uncheck();
+
+    await expect(page.getByLabel(/Terugleververgoeding/i)).toBeVisible({ timeout: 5000 });
+  });
+
+  test("should hide terugleververgoeding input when saldering is enabled", async ({ page }) => {
+    await page.getByLabel(/Jaarlijks stroomverbruik/i).fill("3500");
+    await page.getByLabel(/Saldering actief/i).check();
+
+    // Wait a bit for UI to update
+    await page.waitForTimeout(500);
+
+    // Terugleververgoeding should not be visible when saldering is active
+    const terugleverInput = page.getByLabel(/Terugleververgoeding/i);
+    await expect(terugleverInput).not.toBeVisible();
+  });
+
+  test("should show zelfconsumptie percentage", async ({ page }) => {
+    await page.getByLabel(/Jaarlijks stroomverbruik/i).fill("3500");
+
+    await expect(page.getByText(/Zelfconsumptie/i)).toBeVisible({ timeout: 5000 });
+  });
+
   test("should show graph chart", async ({ page }) => {
     await page.getByLabel(/Jaarlijks stroomverbruik/i).fill("3500");
 
