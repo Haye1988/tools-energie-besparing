@@ -7,7 +7,6 @@ export interface ThuisbatterijInput {
   salderingActief?: boolean; // default true
   stroomPrijs?: number; // €/kWh
   terugleverVergoeding?: number; // €/kWh (default 0.08)
-  gemiddeldDagelijksVerbruik?: number; // kWh (optioneel, anders berekend)
   investeringsKosten?: number; // € (optioneel, voor terugverdientijd)
 }
 
@@ -37,7 +36,6 @@ export function berekenThuisbatterij(input: ThuisbatterijInput): ThuisbatterijRe
     salderingActief = true,
     stroomPrijs = 0.27,
     terugleverVergoeding = 0.08,
-    gemiddeldDagelijksVerbruik,
     investeringsKosten,
   } = input;
 

@@ -3,7 +3,6 @@ export interface LaadpaalInput {
   gewensteLaadtijd: number; // uren
   huisaansluiting: "1-fase" | "3-fase";
   zonnepanelen?: boolean;
-  stroomPrijs?: number; // €/kWh
   evModel?: string; // optioneel, voor onboard lader check
   netaansluiting?: "25A" | "35A" | "onbekend";
   dynamischContract?: boolean; // default false
@@ -60,7 +59,6 @@ export function berekenLaadpaal(input: LaadpaalInput): LaadpaalResult {
     accuCapaciteit,
     gewensteLaadtijd,
     huisaansluiting,
-    stroomPrijs = 0.27,
     evModel,
     netaansluiting,
     dynamischContract = false,

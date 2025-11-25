@@ -46,7 +46,7 @@ export function berekenAirco(input: AircoInput): AircoResult {
   const ruimteInhoud = oppervlakte * hoogte; // m³
 
   // Vermogen per m³
-  let vermogenPerM3Factor = vermogenPerM3[isolatieNiveau] || 40;
+  const vermogenPerM3Factor = vermogenPerM3[isolatieNiveau] || 40;
 
   // Correcties voor extra factoren
   // Aantal personen: +100W per persoon
@@ -73,16 +73,14 @@ export function berekenAirco(input: AircoInput): AircoResult {
     basisVermogenWatt * (1 + zonCorrectie) + personenCorrectie + raamCorrectie;
 
   // Omzetten naar kW
-  const benodigdVermogen = gecorrigeerdVermogenWatt / 1000;
+  let benodigdVermogen = gecorrigeerdVermogenWatt / 1000;
 
   // Beperkingsmelding: waarschuw bij <2 kW of >7 kW
   if (benodigdVermogen < 2) {
     // Te laag, gebruik minimum
-    const benodigdVermogen = 2;
+    benodigdVermogen = 2;
   }
-  if (benodigdVermogen > 7) {
-    // Te hoog, adviseer expert
-  }
+  // Note: >7 kW wordt afgehandeld in advies tekst
 
   // Omzetten naar BTU (1 kW = 3412 BTU)
   const benodigdVermogenBTU = benodigdVermogen * 3412;

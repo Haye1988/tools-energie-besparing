@@ -215,7 +215,7 @@ export default function WarmtepompCalculator() {
 
               {result.scenarioRange && (
                 <div className="bg-white rounded-card border border-gray-100 shadow-card p-6 lg:p-8">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Scenario's</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Scenario&apos;s</h3>
                   <div className="space-y-4">
                     <div>
                       <h4 className="text-sm font-medium text-gray-700 mb-2">Vermogen (kW)</h4>

@@ -52,13 +52,7 @@ const scopWaarden: Record<string, number> = {
   buiten: 2.5, // Buiten: lager rendement (kouder)
 };
 
-// Volume advies (liter) per aantal personen
-function getVolumeAdvies(personen: number, behoefte: string): number {
-  const literPerPersoon = warmwaterBehoeftePerPersoon[behoefte] || 50;
-  const totaalLiterPerDag = personen * literPerPersoon;
-  // Buffer van 1.5x voor comfort
-  return Math.ceil(totaalLiterPerDag * 1.5);
-}
+// Volume advies (liter) per aantal personen - inline berekening gebruikt
 
 export function berekenBoilers(input: BoilersInput): BoilersResult {
   const {

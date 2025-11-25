@@ -10,7 +10,6 @@ export interface ZonnepanelenInput {
   salderingActief?: boolean; // default true
   terugleverVergoeding?: number; // €/kWh, default 0.08
   thuisbatterij?: boolean; // default false
-  batterijCapaciteit?: number; // kWh, alleen als thuisbatterij=true
 }
 
 export interface ZonnepanelenResult {
@@ -57,7 +56,6 @@ export function berekenZonnepanelen(input: ZonnepanelenInput): ZonnepanelenResul
     salderingActief = true,
     terugleverVergoeding = 0.08,
     thuisbatterij = false,
-    batterijCapaciteit,
   } = input;
 
   // Basis opbrengstfactor voor oriëntatie
@@ -89,7 +87,6 @@ export function berekenZonnepanelen(input: ZonnepanelenInput): ZonnepanelenResul
 
   // Zelfconsumptie zonder batterij: ~30% van opwekking wordt direct gebruikt
   const zelfconsumptieZonder = Math.min(jaarlijksVerbruik, jaarlijkseOpwekking * 0.3);
-  const terugleveringZonder = Math.max(0, jaarlijkseOpwekking - zelfconsumptieZonder);
 
   // Zelfconsumptie met batterij: ~65-70% van opwekking wordt gebruikt
   const zelfconsumptieMetBatterij = thuisbatterij
